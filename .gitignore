@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Build output
+build/
+dist/
+*.zip
+
+# Logs and local scratch
+*.log
+data/*
+!data/.gitkeep
+tests/_out/
+tests/out/
+
+# Local notes for Claude Code (contain machine-specific paths)
+CLAUDE.md

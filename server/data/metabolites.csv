@@ -1,0 +1,407 @@
+name,formula,class,kegg
+Glycine,C2H5NO2,Amino acid,C00037
+L-Alanine,C3H7NO2,Amino acid,C00041
+L-Serine,C3H7NO3,Amino acid,C00065
+L-Proline,C5H9NO2,Amino acid,C00148
+L-Valine,C5H11NO2,Amino acid,C00183
+L-Threonine,C4H9NO3,Amino acid,C00188
+L-Cysteine,C3H7NO2S,Amino acid,C00097
+L-Leucine,C6H13NO2,Amino acid,C00123
+L-Isoleucine,C6H13NO2,Amino acid,C00407
+L-Asparagine,C4H8N2O3,Amino acid,C00152
+L-Aspartic acid,C4H7NO4,Amino acid,C00049
+L-Glutamine,C5H10N2O3,Amino acid,C00064
+L-Lysine,C6H14N2O2,Amino acid,C00047
+L-Glutamic acid,C5H9NO4,Amino acid,C00025
+L-Methionine,C5H11NO2S,Amino acid,C00073
+L-Histidine,C6H9N3O2,Amino acid,C00135
+L-Phenylalanine,C9H11NO2,Amino acid,C00079
+L-Arginine,C6H14N4O2,Amino acid,C00062
+L-Tyrosine,C9H11NO3,Amino acid,C00082
+L-Tryptophan,C11H12N2O2,Amino acid,C00078
+L-Cystine,C6H12N2O4S2,Amino acid,C00491
+L-Ornithine,C5H12N2O2,Amino acid derivative,C00077
+L-Citrulline,C6H13N3O3,Amino acid derivative,C00327
+Taurine,C2H7NO3S,Amino acid derivative,C00245
+Hypotaurine,C2H7NO2S,Amino acid derivative,C00519
+beta-Alanine,C3H7NO2,Amino acid derivative,C00099
+Sarcosine,C3H7NO2,Amino acid derivative,C00213
+gamma-Aminobutyric acid (GABA),C4H9NO2,Neurotransmitter,C00334
+2-Aminobutyric acid,C4H9NO2,Amino acid derivative,
+"N,N-Dimethylglycine",C4H9NO2,Amino acid derivative,C01026
+Betaine,C5H11NO2,Amino acid derivative,C00719
+Creatine,C4H9N3O2,Amino acid derivative,C00300
+Creatinine,C4H7N3O,Amino acid derivative,C00791
+Phosphocreatine,C4H10N3O5P,Amino acid derivative,C02305
+Guanidinoacetic acid,C3H7N3O2,Amino acid derivative,C00581
+trans-4-Hydroxy-L-proline,C5H9NO3,Amino acid derivative,C01157
+5-Aminolevulinic acid,C5H9NO3,Amino acid derivative,C00430
+Pyroglutamic acid,C5H7NO3,Amino acid derivative,C01879
+N-Acetyl-L-aspartic acid,C6H9NO5,Amino acid derivative,C01042
+N-Acetyl-L-glutamic acid,C7H11NO5,Amino acid derivative,C00624
+N-Acetylglycine,C4H7NO3,Amino acid derivative,
+N-Acetyl-L-alanine,C5H9NO3,Amino acid derivative,
+N-Acetyl-L-methionine,C7H13NO3S,Amino acid derivative,
+N-Acetyl-L-phenylalanine,C11H13NO3,Amino acid derivative,
+N-Acetyl-L-tryptophan,C13H14N2O3,Amino acid derivative,
+L-Homocysteine,C4H9NO2S,Amino acid derivative,C00155
+L-Cystathionine,C7H14N2O4S,Amino acid derivative,C02291
+L-Methionine sulfoxide,C5H11NO3S,Amino acid derivative,
+S-Adenosyl-L-methionine,C15H22N6O5S,Amino acid derivative,C00019
+S-Adenosyl-L-homocysteine,C14H20N6O5S,Amino acid derivative,C00021
+5'-Methylthioadenosine,C11H15N5O3S,Nucleoside,C00170
+Pipecolic acid,C6H11NO2,Amino acid derivative,C00408
+2-Aminoadipic acid,C6H11NO4,Amino acid derivative,C00956
+Saccharopine,C11H20N2O6,Amino acid derivative,C00449
+Argininosuccinic acid,C10H18N4O6,Amino acid derivative,C03406
+Asymmetric dimethylarginine,C8H18N4O2,Amino acid derivative,C03626
+Homoarginine,C7H16N4O2,Amino acid derivative,
+3-Methylhistidine,C7H11N3O2,Amino acid derivative,
+"N6,N6,N6-Trimethyl-L-lysine (as cation - H)",C9H20N2O2,Amino acid derivative,C03793
+gamma-Butyrobetaine,C7H15NO2,Amino acid derivative,C01181
+Carnosine,C9H14N4O3,Dipeptide,C00386
+Anserine,C10H16N4O3,Dipeptide,C01262
+Cysteinylglycine,C5H10N2O3S,Dipeptide,C01419
+gamma-Glutamylcysteine,C8H14N2O5S,Peptide,C00669
+Glutathione,C10H17N3O6S,Peptide,C00051
+Glutathione disulfide,C20H32N6O12S2,Peptide,C00127
+Ophthalmic acid,C11H19N3O6,Peptide,
+Ergothioneine,C9H15N3O2S,Amino acid derivative,C05570
+L-Kynurenine,C10H12N2O3,Tryptophan metabolite,C00328
+3-Hydroxykynurenine,C10H12N2O4,Tryptophan metabolite,C03227
+Kynurenic acid,C10H7NO3,Tryptophan metabolite,C01717
+Xanthurenic acid,C10H7NO4,Tryptophan metabolite,C02470
+Anthranilic acid,C7H7NO2,Tryptophan metabolite,C00108
+Quinolinic acid,C7H5NO4,Tryptophan metabolite,C03722
+Picolinic acid,C6H5NO2,Tryptophan metabolite,C10164
+Serotonin,C10H12N2O,Neurotransmitter,C00780
+5-Hydroxyindoleacetic acid,C10H9NO3,Tryptophan metabolite,C05635
+Melatonin,C13H16N2O2,Hormone,C01598
+Tryptamine,C10H12N2,Tryptophan metabolite,C00398
+Indole-3-acetic acid,C10H9NO2,Tryptophan metabolite,C00954
+Indole-3-lactic acid,C11H11NO3,Tryptophan metabolite,
+Indole-3-propionic acid,C11H11NO2,Tryptophan metabolite,
+Indoxyl sulfate,C8H7NO4S,Microbial metabolite,
+Dopamine,C8H11NO2,Neurotransmitter,C03758
+Norepinephrine,C8H11NO3,Neurotransmitter,C00547
+Epinephrine,C9H13NO3,Neurotransmitter,C00788
+L-DOPA,C9H11NO4,Neurotransmitter precursor,C00355
+Tyramine,C8H11NO,Biogenic amine,C00483
+Histamine,C5H9N3,Biogenic amine,C00388
+Acetylcholine (as cation - H),C7H15NO2,Neurotransmitter,C01996
+Homovanillic acid,C9H10O4,Neurotransmitter metabolite,C05582
+Vanillylmandelic acid,C9H10O5,Neurotransmitter metabolite,C05584
+Choline (as cation - H),C5H13NO,Choline metabolite,C00114
+Phosphocholine,C5H14NO4P,Choline metabolite,C00588
+Glycerophosphocholine,C8H20NO6P,Choline metabolite,C00670
+CDP-choline,C14H26N4O11P2,Choline metabolite,C00307
+Ethanolamine,C2H7NO,Ethanolamine metabolite,C00189
+Phosphoethanolamine,C2H8NO4P,Ethanolamine metabolite,C00346
+Glycerophosphoethanolamine,C5H14NO6P,Ethanolamine metabolite,C01233
+Trimethylamine N-oxide,C3H9NO,Microbial metabolite,C01104
+Trimethylamine,C3H9N,Microbial metabolite,C00565
+Putrescine,C4H12N2,Polyamine,C00134
+Cadaverine,C5H14N2,Polyamine,C01672
+Spermidine,C7H19N3,Polyamine,C00315
+Spermine,C10H26N4,Polyamine,C00750
+N-Acetylputrescine,C6H14N2O,Polyamine,C02714
+Hippuric acid,C9H9NO3,Microbial metabolite,C01586
+Phenylacetylglycine,C10H11NO3,Microbial metabolite,
+Phenylacetylglutamine,C13H16N2O4,Microbial metabolite,C04148
+p-Cresol sulfate,C7H8O4S,Microbial metabolite,
+Isovalerylglycine,C7H13NO3,Acylglycine,
+Tiglylglycine,C7H11NO3,Acylglycine,
+Hexanoylglycine,C8H15NO3,Acylglycine,
+Pyruvic acid,C3H4O3,Organic acid,C00022
+L-Lactic acid,C3H6O3,Organic acid,C00186
+Citric acid,C6H8O7,TCA cycle,C00158
+Isocitric acid,C6H8O7,TCA cycle,C00311
+cis-Aconitic acid,C6H6O6,TCA cycle,C00417
+2-Oxoglutaric acid,C5H6O5,TCA cycle,C00026
+Succinic acid,C4H6O4,TCA cycle,C00042
+Fumaric acid,C4H4O4,TCA cycle,C00122
+L-Malic acid,C4H6O5,TCA cycle,C00149
+Oxaloacetic acid,C4H4O5,TCA cycle,C00036
+Itaconic acid,C5H6O4,Organic acid,C00490
+2-Hydroxyglutaric acid,C5H8O5,Organic acid,C02630
+Citramalic acid,C5H8O5,Organic acid,C00815
+Methylmalonic acid,C4H6O4,Organic acid,C02170
+Glutaric acid,C5H8O4,Organic acid,C00489
+Adipic acid,C6H10O4,Organic acid,C06104
+Suberic acid,C8H14O4,Organic acid,C08278
+Azelaic acid,C9H16O4,Organic acid,C08261
+Sebacic acid,C10H18O4,Organic acid,C08277
+Glyceric acid,C3H6O4,Organic acid,C00258
+Glycolic acid,C2H4O3,Organic acid,C00160
+Oxalic acid,C2H2O4,Organic acid,C00209
+Malonic acid,C3H4O4,Organic acid,C00383
+Tartaric acid,C4H6O6,Organic acid,
+3-Hydroxybutyric acid,C4H8O3,Ketone body,C01089
+Acetoacetic acid,C4H6O3,Ketone body,C00164
+Mevalonic acid,C6H12O4,Organic acid,C00418
+4-Methyl-2-oxopentanoic acid,C6H10O3,Keto acid,C00233
+3-Methyl-2-oxovaleric acid,C6H10O3,Keto acid,C00671
+3-Methyl-2-oxobutanoic acid,C5H8O3,Keto acid,C00141
+Phenylpyruvic acid,C9H8O3,Keto acid,C00166
+4-Hydroxyphenylpyruvic acid,C9H8O4,Keto acid,C01179
+Phenyllactic acid,C9H10O3,Organic acid,C01479
+4-Hydroxyphenyllactic acid,C9H10O4,Organic acid,C03672
+Homogentisic acid,C8H8O4,Organic acid,C00544
+Benzoic acid,C7H6O2,Organic acid,C00180
+4-Hydroxybenzoic acid,C7H6O3,Organic acid,C00156
+Salicylic acid,C7H6O3,Organic acid,C00805
+Uric acid,C5H4N4O3,Purine metabolite,C00366
+Urea,CH4N2O,Nitrogen metabolism,C00086
+Allantoin,C4H6N4O3,Purine metabolite,C01551
+Orotic acid,C5H4N2O4,Pyrimidine metabolite,C00295
+Adenine,C5H5N5,Nucleobase,C00147
+Guanine,C5H5N5O,Nucleobase,C00242
+Cytosine,C4H5N3O,Nucleobase,C00380
+Uracil,C4H4N2O2,Nucleobase,C00106
+Thymine,C5H6N2O2,Nucleobase,C00178
+Hypoxanthine,C5H4N4O,Purine metabolite,C00262
+Xanthine,C5H4N4O2,Purine metabolite,C00385
+Adenosine,C10H13N5O4,Nucleoside,C00212
+Guanosine,C10H13N5O5,Nucleoside,C00387
+Cytidine,C9H13N3O5,Nucleoside,C00475
+Uridine,C9H12N2O6,Nucleoside,C00299
+Pseudouridine,C9H12N2O6,Nucleoside,C02067
+Thymidine,C10H14N2O5,Nucleoside,C00214
+Inosine,C10H12N4O5,Nucleoside,C00294
+Xanthosine,C10H12N4O6,Nucleoside,C01762
+2'-Deoxyadenosine,C10H13N5O3,Nucleoside,C00559
+2'-Deoxyguanosine,C10H13N5O4,Nucleoside,C00330
+2'-Deoxycytidine,C9H13N3O4,Nucleoside,C00881
+2'-Deoxyuridine,C9H12N2O5,Nucleoside,C00526
+1-Methyladenosine,C11H15N5O4,Modified nucleoside,C02494
+5-Methylcytidine,C10H15N3O5,Modified nucleoside,
+AMP,C10H14N5O7P,Nucleotide,C00020
+ADP,C10H15N5O10P2,Nucleotide,C00008
+ATP,C10H16N5O13P3,Nucleotide,C00002
+GMP,C10H14N5O8P,Nucleotide,C00144
+GDP,C10H15N5O11P2,Nucleotide,C00035
+GTP,C10H16N5O14P3,Nucleotide,C00044
+CMP,C9H14N3O8P,Nucleotide,C00055
+CDP,C9H15N3O11P2,Nucleotide,C00112
+CTP,C9H16N3O14P3,Nucleotide,C00063
+UMP,C9H13N2O9P,Nucleotide,C00105
+UDP,C9H14N2O12P2,Nucleotide,C00015
+UTP,C9H15N2O15P3,Nucleotide,C00075
+IMP,C10H13N4O8P,Nucleotide,C00130
+dAMP,C10H14N5O6P,Nucleotide,C00360
+dTMP,C10H15N2O8P,Nucleotide,C00364
+Cyclic AMP,C10H12N5O6P,Nucleotide,C00575
+Cyclic GMP,C10H12N5O7P,Nucleotide,C00942
+AICAR (ZMP),C9H15N4O8P,Nucleotide,C04677
+NAD+,C21H27N7O14P2,Cofactor,C00003
+NADH,C21H29N7O14P2,Cofactor,C00004
+NADP+,C21H28N7O17P3,Cofactor,C00006
+NADPH,C21H30N7O17P3,Cofactor,C00005
+FAD,C27H33N9O15P2,Cofactor,C00016
+FMN,C17H21N4O9P,Cofactor,C00061
+Coenzyme A,C21H36N7O16P3S,Cofactor,C00010
+Acetyl-CoA,C23H38N7O17P3S,Cofactor,C00024
+Succinyl-CoA,C25H40N7O19P3S,Cofactor,C00091
+ADP-ribose,C15H23N5O14P2,Nucleotide sugar,C00301
+UDP-glucose,C15H24N2O17P2,Nucleotide sugar,C00029
+UDP-N-acetylglucosamine,C17H27N3O17P2,Nucleotide sugar,C00043
+Nicotinamide mononucleotide,C11H15N2O8P,Cofactor,C00455
+Nicotinamide riboside (as cation - H),C11H14N2O5,Vitamin,C03150
+Nicotinic acid,C6H5NO2,Vitamin,C00253
+Nicotinamide,C6H6N2O,Vitamin,C00153
+1-Methylnicotinamide (as cation - H),C7H8N2O,Vitamin metabolite,C02918
+N1-Methyl-2-pyridone-5-carboxamide,C7H8N2O2,Vitamin metabolite,C05842
+Trigonelline,C7H7NO2,Vitamin metabolite,C01004
+Thiamine (as cation - H),C12H16N4OS,Vitamin,C00378
+Riboflavin,C17H20N4O6,Vitamin,C00255
+Pyridoxine,C8H11NO3,Vitamin,C00314
+Pyridoxal,C8H9NO3,Vitamin,C00250
+Pyridoxamine,C8H12N2O2,Vitamin,C00534
+Pyridoxal 5'-phosphate,C8H10NO6P,Vitamin,C00018
+4-Pyridoxic acid,C8H9NO4,Vitamin metabolite,C00847
+Pantothenic acid,C9H17NO5,Vitamin,C00864
+Biotin,C10H16N2O3S,Vitamin,C00120
+Folic acid,C19H19N7O6,Vitamin,C00504
+5-Methyltetrahydrofolic acid,C20H25N7O6,Vitamin,C00440
+Ascorbic acid,C6H8O6,Vitamin,C00072
+Dehydroascorbic acid,C6H6O6,Vitamin,C05422
+Lipoic acid,C8H14O2S2,Cofactor,C16241
+Retinol,C20H30O,Vitamin,C00473
+alpha-Tocopherol,C29H50O2,Vitamin,C02477
+Cholecalciferol,C27H44O,Vitamin,C05443
+25-Hydroxycholecalciferol,C27H44O2,Vitamin,C01561
+Phylloquinone,C31H46O2,Vitamin,C02059
+Coenzyme Q10,C59H90O4,Cofactor,C11378
+Bilirubin,C33H36N4O6,Heme metabolite,C00486
+Biliverdin,C33H34N4O6,Heme metabolite,C00500
+D-Glucose,C6H12O6,Sugar,C00031
+D-Fructose,C6H12O6,Sugar,C00095
+D-Galactose,C6H12O6,Sugar,C00124
+myo-Inositol,C6H12O6,Sugar alcohol,C00137
+D-Ribose,C5H10O5,Sugar,C00121
+D-Xylose,C5H10O5,Sugar,C00181
+Sucrose,C12H22O11,Disaccharide,C00089
+Lactose,C12H22O11,Disaccharide,C00243
+Trehalose,C12H22O11,Disaccharide,C01083
+Glycerol,C3H8O3,Sugar alcohol,C00116
+Erythritol,C4H10O4,Sugar alcohol,C00503
+Xylitol,C5H12O5,Sugar alcohol,C00379
+Ribitol,C5H12O5,Sugar alcohol,C00474
+D-Sorbitol,C6H14O6,Sugar alcohol,C00794
+D-Mannitol,C6H14O6,Sugar alcohol,C00392
+D-Glucuronic acid,C6H10O7,Sugar acid,C00191
+D-Gluconic acid,C6H12O7,Sugar acid,C00257
+D-Glucosamine,C6H13NO5,Amino sugar,C00329
+N-Acetyl-D-glucosamine,C8H15NO6,Amino sugar,C00140
+N-Acetylneuraminic acid,C11H19NO9,Amino sugar,C00270
+Glucose 6-phosphate,C6H13O9P,Sugar phosphate,C00092
+Glucose 1-phosphate,C6H13O9P,Sugar phosphate,C00103
+Fructose 6-phosphate,C6H13O9P,Sugar phosphate,C00085
+"Fructose 1,6-bisphosphate",C6H14O12P2,Sugar phosphate,C00354
+Dihydroxyacetone phosphate,C3H7O6P,Sugar phosphate,C00111
+Glyceraldehyde 3-phosphate,C3H7O6P,Sugar phosphate,C00118
+3-Phosphoglyceric acid,C3H7O7P,Sugar phosphate,C00197
+2-Phosphoglyceric acid,C3H7O7P,Sugar phosphate,C00631
+Phosphoenolpyruvic acid,C3H5O6P,Sugar phosphate,C00074
+Ribose 5-phosphate,C5H11O8P,Sugar phosphate,C00117
+Ribulose 5-phosphate,C5H11O8P,Sugar phosphate,C00199
+Erythrose 4-phosphate,C4H9O7P,Sugar phosphate,C00279
+Sedoheptulose 7-phosphate,C7H15O10P,Sugar phosphate,C05382
+6-Phosphogluconic acid,C6H13O10P,Sugar phosphate,C00345
+Glycerol 3-phosphate,C3H9O6P,Sugar phosphate,C00093
+Phosphoribosyl pyrophosphate,C5H13O14P3,Sugar phosphate,C00119
+L-Carnitine,C7H15NO3,Acylcarnitine,C00318
+Acetylcarnitine (CAR 2:0),C9H17NO4,Acylcarnitine,C02571
+Propionylcarnitine (CAR 3:0),C10H19NO4,Acylcarnitine,C03017
+Malonylcarnitine (CAR 3:0-DC),C10H17NO6,Acylcarnitine,
+Butyrylcarnitine (CAR 4:0),C11H21NO4,Acylcarnitine,C02862
+3-Hydroxybutyrylcarnitine (CAR 4:0-OH),C11H21NO5,Acylcarnitine,
+Succinylcarnitine (CAR 4:0-DC),C11H19NO6,Acylcarnitine,
+Isovalerylcarnitine (CAR 5:0),C12H23NO4,Acylcarnitine,
+Tiglylcarnitine (CAR 5:1),C12H21NO4,Acylcarnitine,
+Glutarylcarnitine (CAR 5:0-DC),C12H21NO6,Acylcarnitine,
+Hexanoylcarnitine (CAR 6:0),C13H25NO4,Acylcarnitine,
+Octanoylcarnitine (CAR 8:0),C15H29NO4,Acylcarnitine,
+Decanoylcarnitine (CAR 10:0),C17H33NO4,Acylcarnitine,
+Dodecanoylcarnitine (CAR 12:0),C19H37NO4,Acylcarnitine,
+Tetradecanoylcarnitine (CAR 14:0),C21H41NO4,Acylcarnitine,
+Palmitoylcarnitine (CAR 16:0),C23H45NO4,Acylcarnitine,C02990
+Stearoylcarnitine (CAR 18:0),C25H49NO4,Acylcarnitine,
+Oleoylcarnitine (CAR 18:1),C25H47NO4,Acylcarnitine,
+Linoleoylcarnitine (CAR 18:2),C25H45NO4,Acylcarnitine,
+Cholic acid,C24H40O5,Bile acid,C00695
+Chenodeoxycholic acid,C24H40O4,Bile acid,C02528
+Deoxycholic acid,C24H40O4,Bile acid,C04483
+Ursodeoxycholic acid,C24H40O4,Bile acid,C07880
+Lithocholic acid,C24H40O3,Bile acid,C03990
+Glycocholic acid,C26H43NO6,Bile acid,C01921
+Glycochenodeoxycholic acid,C26H43NO5,Bile acid,C05466
+Glycodeoxycholic acid,C26H43NO5,Bile acid,
+Glycoursodeoxycholic acid,C26H43NO5,Bile acid,
+Glycolithocholic acid,C26H43NO4,Bile acid,
+Taurocholic acid,C26H45NO7S,Bile acid,C05122
+Taurochenodeoxycholic acid,C26H45NO6S,Bile acid,C05465
+Taurodeoxycholic acid,C26H45NO6S,Bile acid,C05463
+Tauroursodeoxycholic acid,C26H45NO6S,Bile acid,
+Taurolithocholic acid,C26H45NO5S,Bile acid,
+Cholesterol,C27H46O,Sterol,C00187
+Cortisol,C21H30O5,Steroid hormone,C00735
+Cortisone,C21H28O5,Steroid hormone,C00762
+Aldosterone,C21H28O5,Steroid hormone,C01780
+Corticosterone,C21H30O4,Steroid hormone,C02140
+Testosterone,C19H28O2,Steroid hormone,C00535
+Dehydroepiandrosterone,C19H28O2,Steroid hormone,C01227
+Dehydroepiandrosterone sulfate,C19H28O5S,Steroid hormone,C04555
+Androstenedione,C19H26O2,Steroid hormone,C00280
+Progesterone,C21H30O2,Steroid hormone,C00410
+Pregnenolone,C21H32O2,Steroid hormone,C01953
+Estradiol,C18H24O2,Steroid hormone,C00951
+Caffeine,C8H10N4O2,Xenobiotic,C07481
+Theobromine,C7H8N4O2,Xenobiotic,C07480
+Theophylline,C7H8N4O2,Xenobiotic,C07130
+Paraxanthine,C7H8N4O2,Xenobiotic,C13747
+Nicotine,C10H14N2,Xenobiotic,C00745
+Cotinine,C10H12N2O,Xenobiotic,C16323
+Lauric acid (FA 12:0),C12H24O2,Fatty acid,C02679
+Myristic acid (FA 14:0),C14H28O2,Fatty acid,C06424
+Palmitic acid (FA 16:0),C16H32O2,Fatty acid,C00249
+Palmitoleic acid (FA 16:1),C16H30O2,Fatty acid,C08362
+Stearic acid (FA 18:0),C18H36O2,Fatty acid,C01530
+Oleic acid (FA 18:1),C18H34O2,Fatty acid,C00712
+Linoleic acid (FA 18:2),C18H32O2,Fatty acid,C01595
+alpha-Linolenic acid (FA 18:3),C18H30O2,Fatty acid,C06427
+Arachidonic acid (FA 20:4),C20H32O2,Fatty acid,C00219
+Eicosapentaenoic acid (FA 20:5),C20H30O2,Fatty acid,C06428
+Docosahexaenoic acid (FA 22:6),C22H32O2,Fatty acid,C06429
+Decanoic acid (FA 10:0),C10H20O2,Fatty acid,C01571
+Octanoic acid (FA 8:0),C8H16O2,Fatty acid,C06423
+Prostaglandin E2,C20H32O5,Eicosanoid,C00584
+Thromboxane B2,C20H34O6,Eicosanoid,C05963
+Leukotriene B4,C20H32O4,Eicosanoid,C02165
+12-HETE,C20H32O3,Eicosanoid,
+13-HODE,C18H32O3,Oxylipin,
+Anandamide,C22H37NO2,Endocannabinoid,C11695
+2-Arachidonoylglycerol,C23H38O4,Endocannabinoid,C13856
+Palmitoylethanolamide,C18H37NO2,N-Acylethanolamine,C16512
+Oleoylethanolamide,C20H39NO2,N-Acylethanolamine,
+Sphingosine,C18H37NO2,Sphingolipid,C00319
+Sphinganine,C18H39NO2,Sphingolipid,C00836
+Sphingosine 1-phosphate,C18H38NO5P,Sphingolipid,C06124
+Cer d18:1/16:0,C34H67NO3,Ceramide,
+Cer d18:1/18:0,C36H71NO3,Ceramide,
+Cer d18:1/24:0,C42H83NO3,Ceramide,
+Cer d18:1/24:1,C42H81NO3,Ceramide,
+SM d18:1/16:0,C39H79N2O6P,Sphingomyelin,
+SM d18:1/18:0,C41H83N2O6P,Sphingomyelin,
+SM d18:1/24:0,C47H95N2O6P,Sphingomyelin,
+SM d18:1/24:1,C47H93N2O6P,Sphingomyelin,
+LPC 14:0,C22H46NO7P,Lysophosphatidylcholine,
+LPC 16:0,C24H50NO7P,Lysophosphatidylcholine,
+LPC 18:0,C26H54NO7P,Lysophosphatidylcholine,
+LPC 18:1,C26H52NO7P,Lysophosphatidylcholine,
+LPC 18:2,C26H50NO7P,Lysophosphatidylcholine,
+LPC 20:4,C28H50NO7P,Lysophosphatidylcholine,
+LPC 22:6,C30H50NO7P,Lysophosphatidylcholine,
+LPE 16:0,C21H44NO7P,Lysophosphatidylethanolamine,
+LPE 18:0,C23H48NO7P,Lysophosphatidylethanolamine,
+LPE 18:1,C23H46NO7P,Lysophosphatidylethanolamine,
+LPE 18:2,C23H44NO7P,Lysophosphatidylethanolamine,
+LPE 20:4,C25H44NO7P,Lysophosphatidylethanolamine,
+LPE 22:6,C27H44NO7P,Lysophosphatidylethanolamine,
+PC 32:0,C40H80NO8P,Phosphatidylcholine,
+PC 34:1,C42H82NO8P,Phosphatidylcholine,
+PC 34:2,C42H80NO8P,Phosphatidylcholine,
+PC 36:1,C44H86NO8P,Phosphatidylcholine,
+PC 36:2,C44H84NO8P,Phosphatidylcholine,
+PC 36:4,C44H80NO8P,Phosphatidylcholine,
+PC 38:4,C46H84NO8P,Phosphatidylcholine,
+PC 38:6,C46H80NO8P,Phosphatidylcholine,
+PC 40:6,C48H84NO8P,Phosphatidylcholine,
+PE 34:1,C39H76NO8P,Phosphatidylethanolamine,
+PE 36:2,C41H78NO8P,Phosphatidylethanolamine,
+PE 38:4,C43H78NO8P,Phosphatidylethanolamine,
+PE 38:6,C43H74NO8P,Phosphatidylethanolamine,
+PE 40:6,C45H78NO8P,Phosphatidylethanolamine,
+PS 36:1,C42H80NO10P,Phosphatidylserine,
+PS 38:4,C44H78NO10P,Phosphatidylserine,
+PI 36:2,C45H83O13P,Phosphatidylinositol,
+PI 38:4,C47H83O13P,Phosphatidylinositol,
+PG 34:1,C40H77O10P,Phosphatidylglycerol,
+PA 34:1,C37H71O8P,Phosphatidic acid,
+PA 36:2,C39H73O8P,Phosphatidic acid,
+MG 16:0,C19H38O4,Monoacylglycerol,
+MG 18:1,C21H40O4,Monoacylglycerol,
+DG 34:1,C37H70O5,Diacylglycerol,
+DG 36:2,C39H72O5,Diacylglycerol,
+DG 36:4,C39H68O5,Diacylglycerol,
+TG 48:0,C51H98O6,Triacylglycerol,
+TG 50:1,C53H100O6,Triacylglycerol,
+TG 52:2,C55H102O6,Triacylglycerol,
+TG 52:3,C55H100O6,Triacylglycerol,
+TG 54:3,C57H104O6,Triacylglycerol,
+TG 54:4,C57H102O6,Triacylglycerol,
+TG 56:6,C59H102O6,Triacylglycerol,
+CE 16:0,C43H76O2,Cholesteryl ester,
+CE 18:1,C45H78O2,Cholesteryl ester,
+CE 18:2,C45H76O2,Cholesteryl ester,
+CE 20:4,C47H76O2,Cholesteryl ester,

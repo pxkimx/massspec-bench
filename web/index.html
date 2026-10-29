@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MassSpec Bench</title>
+<meta name="author" content="Paul H. Kim, Ph.D.">
+<script>
+/* Light | Dark: applied here, before anything is drawn, so the other theme never flashes. No saved choice =
+   follow the Mac's appearance (the look MassSpec Bench always had). Older versions stored the value JSON-quoted. */
+(function(){try{var t=localStorage.getItem("theme");if(t&&t.charAt(0)==='"')t=JSON.parse(t);
+ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='.5' y='.5' width='31' height='31' rx='7.5' fill='%230d1b22'/><path d='M6.6 25H27.4M7 4.6V25.4' stroke='%236a7b84' stroke-width='1.05' stroke-linecap='round' opacity='.75'/><g stroke-width='2' stroke-linecap='round'><path d='M10 25V17' stroke='%234ea3ff'/><path d='M13.5 25V8' stroke='%2300e0cf'/><path d='M17 25V19' stroke='%23b27bff'/><path d='M20.5 25V12' stroke='%23ffb020'/><path d='M24 25V21' stroke='%23ff5c8a'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f3f5f6; --bg2:#e9eef0; --panel:#ffffff; --panel2:#f8fafb; --ink:#0d1b22; --ink2:#33454f; --muted:#5a6a72; --line:#dde4e8; --line2:#eef2f4;
+  --accent:#0f766e; --accent2:#14b8a6; --accent-soft:#e0f4f1; --accent-ink:#ffffff;
+  --warn:#a34a07; --warn-soft:#fdf0dc; --info:#3056a8; --info-soft:#e7eefb; --up:#c9304f; --down:#2a64b0;
+  --glow:rgba(20,184,166,.18); --shadow:0 1px 2px rgba(13,27,34,.04),0 8px 24px -12px rgba(13,27,34,.12);
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1115; --bg2:#0f171c; --panel:#121b21; --panel2:#162129; --ink:#e4ecef; --ink2:#b8c6cc; --muted:#83959d; --line:#22313a; --line2:#1a262d;
+  --accent:#2dd4bf; --accent2:#5eead4; --accent-soft:#12302e; --accent-ink:#04201d;
+  --warn:#f5b454; --warn-soft:#33250f; --info:#8fb0f5; --info-soft:#18233a; --up:#f27a92; --down:#6ea8f0;
+  --glow:rgba(45,212,191,.14); --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --bg:#0b1115; --bg2:#0f171c; --panel:#121b21; --panel2:#162129; --ink:#e4ecef; --ink2:#b8c6cc; --muted:#83959d; --line:#22313a; --line2:#1a262d;
+  --accent:#2dd4bf; --accent2:#5eead4; --accent-soft:#12302e; --accent-ink:#04201d;
+  --warn:#f5b454; --warn-soft:#33250f; --info:#8fb0f5; --info-soft:#18233a; --up:#f27a92; --down:#6ea8f0;
+  --glow:rgba(45,212,191,.14); --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono)}
+[hidden]{display:none!important}
+
+/* shell */
+.shell{display:grid;grid-template-columns:276px minmax(0,1fr);min-height:100%}
+aside.side{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;padding:18px 14px;gap:18px;overflow:auto}
+.logo{display:flex;align-items:center;gap:12px;padding:6px 4px 2px;text-decoration:none;color:var(--ink);min-width:0}
+.logo svg{flex:none;filter:drop-shadow(0 3px 12px var(--glow))}
+.logo b{display:block;font-weight:680;font-size:20px;letter-spacing:-.025em;line-height:1.1}
+.logo .who{display:block;font-size:11.5px;color:var(--ink2);font-weight:550;font-style:italic;margin-top:3px;letter-spacing:.005em}
+.logo small{display:block;font:500 9.5px var(--mono);color:var(--muted);letter-spacing:.01em;margin-top:3px}
+.navlabel{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:0 8px;margin-bottom:6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;color:var(--ink2);text-decoration:none;font-weight:500}
+.nav a:hover{background:var(--bg2);color:var(--ink)}
+.nav a.on{background:var(--accent-soft);color:var(--accent)}
+.nav a i{width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font:600 10px var(--mono);font-style:normal;background:var(--bg2);color:var(--muted)}
+.nav a.on i{background:var(--accent);color:var(--accent-ink)}
+.dl a{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px}
+.dl a:hover{background:var(--bg2)}
+.dl a span:last-child{color:var(--muted);font:11px var(--mono)}
+.side .foot{margin-top:auto;display:flex;gap:6px;align-items:center;color:var(--muted);font-size:12px;padding:0 6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:550;cursor:pointer;text-decoration:none;color:var(--ink);white-space:nowrap;transition:border-color .15s,background .15s,transform .05s}
+.btn:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.6)}
+.btn:disabled:hover{border-color:var(--line)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--bg2)}
+.btn.sm{height:30px;padding:0 10px;font-size:13px;border-radius:8px}
+.btn svg{width:16px;height:16px}
+main{min-width:0;padding:0 32px 64px}
+@media (max-width:900px){.shell{grid-template-columns:1fr}aside.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px}aside.side #navWrap,aside.side .dlwrap,aside.side .foot{display:none}aside.side #toolsWrap{margin-left:auto}aside.side #toolsWrap .navlabel{display:none}aside.side #toolsWrap .nav{flex-direction:row;gap:4px}main{padding:0 16px 48px}}
+
+/* home */
+.hero{position:relative;margin:24px 0 0;border-radius:22px;overflow:hidden;background:radial-gradient(1200px 400px at 80% -10%,var(--glow),transparent 60%),var(--panel);border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero .in{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;padding:44px 40px 40px}
+@media (max-width:1000px){.hero .in{grid-template-columns:1fr;padding:28px 20px}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 11.5px var(--mono);letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:99px}
+.hero h1{font-size:clamp(34px,4.4vw,56px);line-height:1.02;letter-spacing:-.045em;font-weight:650;margin:16px 0 14px;text-wrap:balance}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),#d97706 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lede{font-size:16px;color:var(--ink2);max-width:52ch;margin:0}
+.stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}
+.chip{font:500 11.5px var(--mono);padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 80%,transparent);color:var(--ink2)}
+.drop{background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.zone{border:1.5px dashed var(--line);border-radius:14px;padding:26px 18px;text-align:center;cursor:pointer;transition:all .15s;background:var(--panel2)}
+.zone:hover,.zone.over{border-color:var(--accent);background:var(--accent-soft)}
+.zone b{display:block;font-size:15px;margin:10px 0 2px}
+.zone small{color:var(--muted)}
+.zone .ic{width:44px;height:44px;border-radius:12px;background:var(--ink);color:var(--bg);display:inline-grid;place-items:center}
+.files{display:flex;flex-direction:column;gap:6px}
+.file{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:var(--panel)}
+.file span.n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file span.s{font:11.5px var(--mono);color:var(--muted)}
+.seg{display:inline-flex;padding:3px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.seg button{border:0;background:transparent;padding:5px 12px;border-radius:7px;font-weight:550;font-size:13px;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row.between{justify-content:space-between}
+details.settings{border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+details.settings summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:550;display:flex;justify-content:space-between;align-items:center}
+details.settings summary::-webkit-details-marker{display:none}
+details.settings summary::after{content:"+";font:500 16px var(--mono);color:var(--muted)}
+details.settings[open] summary::after{content:"−"}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;padding:4px 12px 14px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
+.form label.cb{flex-direction:row;align-items:center;gap:8px;color:var(--ink2);font-size:13px}
+.form input[type=text],.form input[type=number],.form select{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font-size:13px;width:100%}
+.form input[type=range]{accent-color:var(--accent)}
+.form .full{grid-column:1/-1}
+.examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ex{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:3px;transition:border-color .15s,transform .15s}
+.ex:hover{border-color:var(--accent);transform:translateY(-1px)}
+.ex.dim{opacity:.55}
+.ex.dim:hover{border-color:var(--warn)}
+.recent h2 .hint{font-weight:400;font-size:13px}
+#recentMore{margin-top:10px}
+.ex b{font-weight:600;font-size:13.5px}
+.ex small{color:var(--muted);font-size:12px;line-height:1.35}
+.ex .k{font:500 10.5px var(--mono);color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.feat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:22px}
+@media (max-width:1000px){.feat{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.feat,.examples,.form{grid-template-columns:1fr}}
+.feat div{padding:16px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.feat h3{margin:8px 0 4px;font-size:14px;font-weight:600}
+.feat p{margin:0;color:var(--muted);font-size:13px}
+.feat svg{width:22px;height:22px;color:var(--accent)}
+.recent{margin-top:26px}
+.recent h2{font-size:14px;font-weight:600;margin:0 0 10px}
+
+/* running */
+.run{max-width:640px;margin:10vh auto 0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow)}
+.run h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.bar{height:6px;border-radius:99px;background:var(--bg2);overflow:hidden;margin:18px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s ease;position:relative}
+.bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:sheen 1.4s infinite}
+@keyframes sheen{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.steps{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:2px}
+.steps li{display:flex;align-items:center;gap:10px;padding:6px 4px;color:var(--muted);font-size:13.5px}
+.steps li i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);flex:none;display:grid;place-items:center}
+.steps li.done{color:var(--ink2)}
+.steps li.done i{background:var(--accent);border-color:var(--accent)}
+.steps li.done i::after{content:"";width:6px;height:3px;border-left:1.5px solid var(--accent-ink);border-bottom:1.5px solid var(--accent-ink);transform:rotate(-45deg) translate(1px,-1px)}
+.steps li.now{color:var(--ink);font-weight:550}
+.steps li.now i{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.bar i::after,.steps li.now i{animation:none}}
+.errbox{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--warn-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent)}
+
+/* results */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);margin:0 -32px;padding:14px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+@media (max-width:900px){.top{margin:0 -16px;padding:12px 16px}}
+.top h1{margin:0;font-size:18px;letter-spacing:-.02em;font-weight:620;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.badge{font:500 11px var(--mono);padding:3px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px}
+.tile{padding:14px 16px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line)}
+.tile b{display:block;font-size:24px;font-weight:620;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
+.tile span{font-size:12px;color:var(--muted)}
+.insights{margin-top:14px;border-radius:18px;padding:6px;background:linear-gradient(135deg,var(--accent-soft),transparent 60%),var(--panel);border:1px solid var(--line)}
+.insights h2{margin:12px 14px 6px;font-size:15px;font-weight:620;display:flex;align-items:center;gap:8px}
+.insight{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;padding:10px 14px;border-top:1px solid var(--line2);font-size:13.5px;color:var(--ink2)}
+.insight:first-of-type{border-top:0}
+.insight b{color:var(--ink);font-weight:600}
+.tag{font:600 10px var(--mono);letter-spacing:.06em;height:20px;padding:0 7px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;width:max-content}
+.tag.ok{background:var(--accent-soft);color:var(--accent)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.info{background:var(--info-soft);color:var(--info)}
+section.sec{padding-top:40px;scroll-margin-top:70px}
+.sech{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sech .k{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.sech h2{margin:0;font-size:24px;letter-spacing:-.03em;font-weight:630}
+.sec p.lede{color:var(--muted);max-width:90ch;margin:6px 0 18px}
+.sec p.lede code{font:12px var(--mono);background:var(--bg2);padding:1px 5px;border-radius:5px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card.wide{grid-column:1/-1}
+.card .hd{display:flex;align-items:flex-start;gap:10px;padding:14px 16px 10px}
+.card .hd h3{margin:0;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.card .hd .sub{font:11.5px var(--mono);color:var(--muted);margin-top:2px}
+.card .hd .act{margin-left:auto;display:flex;gap:2px}
+.fig{margin:0 12px;border-radius:12px;background:#fff;border:1px solid var(--line2);display:grid;place-items:center;padding:10px;cursor:zoom-in;overflow:hidden}
+.fig img{max-width:100%;height:auto;display:block;max-height:560px}
+.card .ft{padding:12px 16px 16px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.card .ft .how{color:var(--muted)}
+.card .ft .yours{color:var(--ink2);padding:9px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line2)}
+.card .ft .yours b{color:var(--accent);font-weight:600}
+.card .ft .yours::before{content:"In your data";display:block;font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.tbl{padding:0 16px 8px}
+.tbl .tools{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tbl input{height:32px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font-size:13px;width:220px;max-width:100%}
+.tscroll{overflow:auto;max-height:440px;border:1px solid var(--line2);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{position:sticky;top:0;background:var(--panel2);text-align:left;font:500 11px var(--mono);letter-spacing:.04em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+td{padding:6px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+tr:hover td{background:var(--panel2)}
+td.gene{font-family:var(--mono);font-weight:500}
+.note{color:var(--muted);font-size:12.5px;padding:8px 16px 16px}
+.methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:800px){.methods{grid-template-columns:1fr}}
+.methods div{padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.methods h4{margin:0 0 4px;font-size:13.5px}
+.methods p{margin:0;color:var(--muted);font-size:13px}
+.versions{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+
+/* explorer */
+.explorer{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:0;border-top:1px solid var(--line2)}
+@media (max-width:800px){.explorer{grid-template-columns:1fr}}
+.explorer .plot{position:relative;min-height:460px;background:var(--panel2)}
+.explorer canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.explorer .panel{border-left:1px solid var(--line2);padding:14px;display:flex;flex-direction:column;gap:12px;max-height:520px;overflow:auto}
+@media (max-width:800px){.explorer .panel{border-left:0;border-top:1px solid var(--line2)}}
+.explorer .panel label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.explorer select,.explorer input{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel);font-size:13px}
+.leg{display:flex;flex-direction:column;gap:1px}
+.leg button{all:unset;display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;font-size:12.5px;cursor:pointer}
+.leg button:hover{background:var(--bg2)}
+.leg button.off{opacity:.35}
+.leg i{width:10px;height:10px;border-radius:3px;flex:none}
+.grad{height:10px;border-radius:99px;background:linear-gradient(90deg,#440154,#3b528b,#21918c,#5ec962,#fde725)}
+.hint{font-size:12px;color:var(--muted)}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font:12px var(--mono);padding:5px 8px;border-radius:7px;white-space:nowrap}
+.plot .zoomctl{position:absolute;right:10px;top:10px;display:flex;gap:4px}
+
+/* chat panel */
+.chatwrap{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--panel);border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;box-shadow:-20px 0 40px -24px rgba(0,0,0,.35);transform:translateX(100%);transition:transform .2s ease}
+.chatwrap.open{transform:none}
+@media (prefers-reduced-motion:reduce){.chatwrap{transition:none}}
+body.chat-open main{padding-right:calc(32px + min(440px,100vw))}
+@media (max-width:1200px){body.chat-open main{padding-right:32px}}
+.chat-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.chat-h h3{margin:0;font-size:14px;font-weight:620;flex:1;display:flex;align-items:center;gap:8px}
+.chat-h .ctx{font:11px var(--mono);color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-b{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:100%;font-size:13.5px;line-height:1.55}
+.msg.user{align-self:flex-end;background:var(--accent-soft);color:var(--ink);padding:9px 12px;border-radius:14px 14px 4px 14px;max-width:85%}
+.msg.ai{color:var(--ink)}
+.msg.ai p{margin:0 0 8px}.msg.ai p:last-child{margin:0}
+.msg.ai code{font:12px var(--mono);background:var(--bg2);padding:1px 5px;border-radius:4px}
+.msg.ai pre{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font:12px/1.5 var(--mono)}
+.msg.ai ul,.msg.ai ol{margin:4px 0 8px;padding-left:20px}
+.msg.ai img{max-width:100%;border-radius:8px;border:1px solid var(--line);background:#fff;margin:4px 0}
+.msg.ai h1,.msg.ai h2,.msg.ai h3{font-size:14px;margin:8px 0 4px}
+.toolcard{border:1px solid var(--line);border-radius:10px;background:var(--panel2);font-size:12px;overflow:hidden}
+.toolcard summary{list-style:none;cursor:pointer;padding:7px 10px;display:flex;gap:8px;align-items:center;color:var(--ink2)}
+.toolcard summary::-webkit-details-marker{display:none}
+.toolcard summary i{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.toolcard summary i.run{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.toolcard summary b{font:600 12px var(--mono)}
+.toolcard pre{margin:0;padding:8px 10px;border-top:1px solid var(--line2);font:11px/1.45 var(--mono);white-space:pre-wrap;max-height:220px;overflow:auto;color:var(--muted)}
+.chat-f{border-top:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.chat-f textarea{width:100%;min-height:64px;max-height:180px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--panel2);font:13.5px var(--sans);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{all:unset;cursor:pointer;font-size:12px;padding:4px 9px;border-radius:99px;border:1px solid var(--line);color:var(--ink2);background:var(--panel)}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+.fab{position:fixed;right:20px;bottom:20px;z-index:39;height:44px;padding:0 16px;border-radius:99px;background:var(--ink);color:var(--bg);border:0;font:600 13.5px var(--sans);display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px -10px rgba(0,0,0,.45)}
+.fab:hover{background:var(--accent);color:var(--accent-ink)}
+.fab svg{width:16px;height:16px}
+body.chat-open .fab{display:none}
+
+/* code viewer */
+.codewrap{position:fixed;inset:0;z-index:62;display:grid;grid-template-columns:220px minmax(0,1fr);background:var(--panel)}
+@media (max-width:800px){.codewrap{grid-template-columns:1fr}.codewrap .files{display:none}}
+.codewrap .files{border-right:1px solid var(--line);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.codewrap .files a{display:block;padding:6px 8px;border-radius:7px;font:12.5px var(--mono);color:var(--ink2);text-decoration:none;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.codewrap .files a.on{background:var(--accent-soft);color:var(--accent)}
+.codewrap .files .navlabel{margin:10px 0 4px}
+.codewrap .body{display:flex;flex-direction:column;min-width:0}
+.codewrap .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.codewrap .bar h3{margin:0;font:600 13px var(--mono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.codewrap pre{margin:0;flex:1;overflow:auto;padding:16px 18px;font:12.5px/1.55 var(--mono);color:var(--ink);background:var(--panel2);tab-size:4}
+.codewrap .desc{padding:10px 14px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line2)}
+.geo{display:flex;flex-direction:column;gap:8px}
+.geo .list{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.geo .list label{display:flex;gap:8px;align-items:center;padding:6px 10px;font:12px var(--mono);border-bottom:1px solid var(--line2);cursor:pointer}
+.geo .list label span.sz{margin-left:auto;color:var(--muted)}
+.modal{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(5,12,16,.5);padding:16px}
+.modal .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(460px,100%);display:flex;flex-direction:column;gap:12px}
+.modal h3{margin:0;font-size:16px}
+.modal label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.modal input,.modal select{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font-size:13px}
+
+/* drawer + lightbox */
+.scrim{position:fixed;inset:0;background:rgba(5,12,16,.45);z-index:60;backdrop-filter:blur(2px)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--panel);z-index:61;border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-20px 0 40px -20px rgba(0,0,0,.3)}
+.drawer .dh{display:flex;align-items:center;padding:16px;border-bottom:1px solid var(--line)}
+.drawer .dh h3{margin:0;font-size:16px;flex:1}
+.drawer .db{overflow:auto;padding:8px 4px}
+.drawer .df{padding:14px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.params .pgroup{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-bottom:12px;padding:0 0 8px}
+.params .pgh{padding:14px 18px 6px}
+.params .prow{padding:10px 18px}
+.params .lede .tag{vertical-align:1px}
+.pbar{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;padding:12px 18px;border:1px solid var(--line);border-radius:var(--r);
+ background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--shadow);
+ padding-right:150px}  /* keep the Re-analyze button clear of the floating "Ask Claude" button */
+.pbar span{flex:1;font-size:12.5px;color:var(--muted)}
+.pbar .btn.accent:disabled{opacity:.45;cursor:not-allowed}
+
+.drawer .df .sp{flex:1;font-size:12px;color:var(--muted);align-self:center;text-align:left}
+.pgroup{border-bottom:1px solid var(--line2);padding:2px 0 10px}
+.pgroup:last-child{border-bottom:0}
+.pgh{padding:14px 16px 2px}
+.pgh h4{margin:0;font-size:13px;letter-spacing:.02em;text-transform:uppercase;font-family:var(--mono);font-weight:500;color:var(--accent)}
+.pgh p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.prow{display:grid;grid-template-columns:1fr minmax(0,230px);gap:4px 14px;align-items:start;padding:10px 16px;border-radius:10px}
+.prow:hover{background:var(--panel2)}
+.prow.changed{background:var(--accent-soft)}
+.prow .pk{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-weight:550;font-size:13.5px;min-height:34px}
+.prow .pc{display:flex;align-items:center;gap:8px;justify-content:flex-end;min-height:34px}
+.prow .pc input[type=text],.prow .pc input[type=number],.prow .pc select{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font-size:13px;width:100%;color:var(--ink)}
+.prow .pc input[type=range]{accent-color:var(--accent);width:100%}
+.prow .pc .rv{font:12px var(--mono);color:var(--ink2);min-width:34px;text-align:right}
+.prow .pc .ro{font:12.5px var(--mono);color:var(--ink2);text-align:right;line-height:1.35}
+.prow .pw{grid-column:1/-1;margin:2px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted);max-width:68ch}
+.prow .ms{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.prow .ms label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;background:var(--panel2);cursor:pointer}
+.prow .ms label:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.tag{font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);background:var(--panel2);white-space:nowrap}
+.tag.auto{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:var(--accent-soft)}
+.tag.user{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);background:var(--warn-soft)}
+.tag.fixed{color:var(--info);border-color:color-mix(in srgb,var(--info) 30%,transparent);background:var(--info-soft)}
+.lightbox{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(5,12,16,.8);padding:24px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:100%;background:#fff;border-radius:12px;padding:12px}
+/* The cell cloud runs behind the hero copy. A halo in the panel colour keeps the text readable without
+   covering the animation, which a solid scrim would. */
+.hero h1,.hero .lede,.hero .byline{text-shadow:0 0 14px var(--panel),0 0 6px var(--panel),0 1px 2px var(--panel)}
+.hero h1 em{text-shadow:none}   /* clipped-gradient text: a shadow would paint straight over it */
+.hero .chip{background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.hero .eyebrow{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+/* How it works */
+#workflow .flowlede{max-width:70ch;margin:14px 0 4px}
+#workflow .flowseg{margin:18px 0 2px}
+ol.flow{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:12px}
+ol.flow li{display:grid;grid-template-columns:34px 190px minmax(0,1fr);gap:16px;align-items:start;
+ border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:16px 18px}
+ol.flow .n{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font:600 13px var(--mono);
+ background:var(--accent-soft);color:var(--accent)}
+ol.flow .ill{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:6px}
+ol.flow .ill svg{display:block;width:100%;height:auto}
+ol.flow h3{margin:2px 0 6px;font-size:15px}
+ol.flow .what{margin:0 0 8px;font-size:13.5px;line-height:1.55;color:var(--ink2)}
+ol.flow .why{margin:0;font-size:13px;line-height:1.55;color:var(--muted);border-left:2px solid var(--accent);padding-left:10px}
+#workflow .flowfoot{margin:18px 0 40px;max-width:70ch}
+@media (max-width:820px){ol.flow li{grid-template-columns:28px minmax(0,1fr)}ol.flow .ill{grid-column:1/-1}}
+#confirmRow{margin:2px 0 0;padding:0 2px}
+#confirmRow label{font-size:12.5px;color:var(--ink2)}
+#confirmRow.need label{color:var(--warn);font-weight:600}
+#confirmRow.need{animation:nudge .35s ease}
+@keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion: reduce){#confirmRow.need{animation:none}}
+.zoomctl .btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.selbox{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.selbox .selhead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
+.selbox .btn.full{width:100%}
+.selbox .seltab{max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.selbox table{width:100%;border-collapse:collapse;font-size:12px}
+.selbox th{position:sticky;top:0;background:var(--panel);text-align:left;font-weight:600;padding:5px 7px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}
+.selbox td{padding:3px 7px;border-bottom:1px solid var(--line2)}
+.selbox td:first-child{font-weight:600}
+.selbox .selcav{font-size:11.5px;line-height:1.45;margin:0}
+.card .act .vec{font:600 10.5px var(--mono);letter-spacing:.04em;padding:0 8px;height:28px}
+.runcv{width:100%;height:150px;display:block;margin:14px 0 2px;border-radius:12px;background:var(--panel2);border:1px solid var(--line2)}
+/* sidebar: live job card, quick-switch list, byline */
+.jobcard{border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:12px;background:var(--accent-soft);padding:10px;display:flex;flex-direction:column;gap:7px}
+.jobcard .jr-top{display:flex;align-items:center;gap:7px;font-size:12.5px}
+.jobcard .jr-top b{flex:1;font-weight:600;color:var(--accent)}
+.jobcard .jr-top .mono{font-size:11.5px;color:var(--accent)}
+.jobcard .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+.jobcard .jr-msg{font-size:11.5px;color:var(--ink2);line-height:1.35;min-height:2.4em}
+.jobcard .jr-bar{height:4px;border-radius:99px;background:color-mix(in srgb,var(--accent) 22%,transparent);overflow:hidden}
+.jobcard .jr-bar i{display:block;height:100%;width:2%;background:var(--accent);border-radius:99px;transition:width .5s ease}
+.nav.sr a{font-size:12.5px;padding:6px 8px;gap:8px}
+.nav.sr a small{display:block;font:10.5px var(--mono);color:var(--muted)}
+.nav a .caret{margin-left:auto;font-weight:400;color:var(--muted);transition:transform .18s;display:inline-block}
+.nav a[aria-expanded="true"] .caret{transform:rotate(90deg)}
+.subnav{display:flex;flex-direction:column;margin:2px 0 4px 26px;border-left:1px solid var(--line);padding-left:6px}
+.subnav a{padding:5px 8px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:12.5px}
+.subnav a:hover{background:var(--bg2);color:var(--ink)}
+.subnav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav.sr a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side .foot .by{color:var(--ink2);font-weight:600}
+.byline{margin:2px 0 10px;font-size:13px;color:var(--muted);font-style:italic}
+.byline b{color:var(--ink2);font-weight:600}
+@media (prefers-reduced-motion: reduce){.jobcard .dot{animation:none;opacity:.9}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:80;font-size:13px}
+
+/* ---------- MassSpec Bench additions ---------- */
+.themesw{display:inline-flex;align-self:flex-start;padding:3px;gap:2px;border-radius:99px;background:var(--bg2);border:1px solid var(--line)}
+.themesw button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font:550 12px var(--sans);color:var(--ink2);transition:background .15s,color .15s}
+.themesw button svg{width:14px;height:14px}
+.themesw button:hover{color:var(--ink)}
+.themesw button[aria-checked="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.themesw button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (max-width:900px){.themesw{align-self:center}}
+.drop{container-type:inline-size}
+.kinds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+/* the panel, not the window, decides: at 1024 px the panel is ~240 px and four tabs would clip their labels */
+@container (max-width:460px){.kinds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kinds button b,.kinds button small{overflow-wrap:anywhere}
+.kinds button{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:9px 10px;background:var(--panel);display:flex;flex-direction:column;gap:2px;transition:border-color .15s}
+.kinds button b{font-size:13px;font-weight:600}
+.kinds button small{font-size:11px;color:var(--muted);line-height:1.3}
+.kinds button.on{border-color:var(--accent);background:var(--accent-soft)}
+.kinds button.on b{color:var(--accent)}
+.kinddesc{font-size:12.5px;color:var(--ink2);background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:9px 11px}
+.pickrow{display:flex;gap:8px;flex-wrap:wrap}
+.pickrow .btn{flex:1}
+.zone.small{padding:14px 12px}
+.zone.small b{font-size:13.5px;margin:4px 0 0}
+.sheet{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.sheet .sh{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line2);font-size:12.5px;flex-wrap:wrap}
+.sheet .sh b{font-weight:600}
+.sheet .tscroll{max-height:260px;border:0;border-radius:0}
+.sheet td{padding:3px 6px}
+.sheet td input,.sheet td select{height:26px;border:1px solid var(--line2);border-radius:6px;padding:0 6px;background:var(--panel2);font-size:12px;width:100%;min-width:60px;color:var(--ink)}
+.sheet td.fn{font:11.5px var(--mono);max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.sheet td.bad{color:var(--warn)}
+.sheet tr.type-qc td.fn{font-weight:600}
+.probs{font-size:12px;color:var(--warn);padding:6px 10px}
+.fieldrow{display:flex;gap:6px;align-items:center}
+.fieldrow input[type=text]{flex:1;min-width:0}
+.fieldrow select{min-width:0}
+.fieldrow .btn{flex:none}
+.pathpill{font:11.5px var(--mono);color:var(--ink2);background:var(--bg2);border-radius:6px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+textarea.targets{width:100%;min-height:90px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--panel2);font:12px var(--mono);color:var(--ink);resize:vertical}
+/* file browser */
+.fb{width:min(760px,100%)!important;max-height:86vh}
+.fb .fbbar{display:flex;gap:6px;align-items:center}
+.fb .fbbar input{flex:1;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font:12.5px var(--mono)}
+.fb .roots{display:flex;gap:4px;flex-wrap:wrap}
+.fb .roots button{all:unset;cursor:pointer;font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--ink2)}
+.fb .roots button:hover{border-color:var(--accent);color:var(--accent)}
+.fb .list{border:1px solid var(--line);border-radius:10px;overflow:auto;min-height:260px;max-height:48vh;background:var(--panel2)}
+.fb .it{display:grid;grid-template-columns:22px 20px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line2);font-size:13px;cursor:pointer}
+.fb .it:hover{background:var(--panel)}
+.fb .it .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb .it .fm{font:11px var(--mono);color:var(--accent)}
+.fb .it .fm.no{color:var(--warn)}
+.fb .it .sz{font:11px var(--mono);color:var(--muted);min-width:64px;text-align:right}
+.fb .it.dim{opacity:.55}
+/* interactive plots */
+.xp{display:grid;grid-template-columns:minmax(0,1fr) 280px;border-top:1px solid var(--line2)}
+@media (max-width:980px){.xp{grid-template-columns:1fr}}
+.xp .plots{display:flex;flex-direction:column;min-width:0}
+.xp .pl{position:relative;height:230px;border-bottom:1px solid var(--line2);background:var(--panel)}
+.xp .pl.tall{height:270px}
+.xp .pl canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.xp .pl .cap{position:absolute;left:12px;top:6px;font:11px var(--mono);color:var(--muted);pointer-events:none;z-index:2;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xp .pl .pact{position:absolute;right:8px;top:4px;display:flex;gap:4px;z-index:3}
+.xp .pl .pact .btn{height:24px;padding:0 8px;font-size:11.5px;border-radius:7px}
+.xp .side{border-left:1px solid var(--line2);padding:12px;display:flex;flex-direction:column;gap:12px;max-height:1000px;overflow:auto;font-size:12.5px}
+@media (max-width:980px){.xp .side{border-left:0;border-top:1px solid var(--line2)}}
+.xp .side label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.xp .side input,.xp .side select{height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;background:var(--panel2);font-size:12.5px;color:var(--ink)}
+.xp .side h4{margin:0;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.xp .side .grp{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid var(--line2)}
+.xp .side .grp:last-child{border-bottom:0}
+.xp .side .two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mini{width:100%;border-collapse:collapse;font-size:11.5px}
+.mini th{position:static;background:none;padding:3px 4px;font-size:10.5px;cursor:default}
+.mini td{padding:3px 4px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+.mini tr.click{cursor:pointer}
+.mini tr.click:hover td{background:var(--accent-soft)}
+.mini i.sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--accent-soft)!important}
+/* calculators */
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:1100px){.calc{grid-template-columns:1fr}}
+.calc .card{padding:0 0 14px}
+.calc .body{padding:0 16px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.calc input,.calc select{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel2);font-size:13px;color:var(--ink)}
+.calc .out{font-size:12.5px}
+.calc .big{font:600 20px var(--mono);letter-spacing:-.02em}
+.calc canvas{width:100%;height:150px;display:block;border:1px solid var(--line2);border-radius:10px;background:var(--panel2)}
+.fmtgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px}
+.fmtgrid div{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 14px;font-size:12.5px;color:var(--muted)}
+.fmtgrid b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}
+.fmtgrid .st{font:500 10.5px var(--mono);letter-spacing:.05em;text-transform:uppercase}
+.fmtgrid .st.y{color:var(--accent)}.fmtgrid .st.c{color:var(--info)}.fmtgrid .st.n{color:var(--warn)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="logo" href="#" id="homeLink">
+      <svg width="52" height="52" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="var(--ink)"/>
+        <g stroke="var(--muted)" stroke-width="1.05" stroke-linecap="round" fill="none" opacity=".75"><path d="M7 4.6 V25.4"/><path d="M6.6 25 H27.4"/></g>
+        <g stroke-width="2" stroke-linecap="round"><path d="M10 25V17" stroke="#4ea3ff"/><path d="M13.5 25V8" stroke="#00e0cf"/><path d="M17 25V19" stroke="#b27bff"/><path d="M20.5 25V12" stroke="#ffb020"/><path d="M24 25V21" stroke="#ff5c8a"/></g>
+      </svg>
+      <span><b>MassSpec Bench</b><span class="who">created by Paul H. Kim, Ph.D.</span><small>pyopenms · sage · <span id="appVersion"></span></small></span>
+    </a>
+    <div class="themesw" id="themeSw" role="radiogroup" aria-label="Colour theme">
+      <button role="radio" data-t="light" aria-checked="false" title="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Light</button>
+      <button role="radio" data-t="dark" aria-checked="false" title="Dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Dark</button>
+    </div>
+    <button class="btn primary" id="newBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>New analysis</button>
+    <div class="navwrap" id="navWrap" hidden><div class="navlabel">Report</div><nav class="nav" id="nav"></nav></div>
+    <div class="dlwrap" id="dlWrap" hidden><div class="navlabel">Downloads</div><div class="dl" id="dl"></div></div>
+    <div class="jobcard" id="sideRunning" hidden>
+      <div class="jr-top"><span class="dot"></span><b id="jr_kind">running</b><span class="mono" id="jr_pct">0%</span></div>
+      <div class="jr-msg" id="jr_msg">Starting</div>
+      <div class="jr-bar"><i id="jr_bar"></i></div>
+      <div class="row" style="gap:6px"><button class="btn ghost sm" id="jr_open">Watch</button><button class="btn ghost sm" id="jr_stop">Stop</button></div>
+    </div>
+    <div class="navwrap" id="sideRecentWrap" hidden><div class="navlabel">Recent</div><nav class="nav sr" id="sideRecent"></nav></div>
+    <div class="navwrap" id="toolsWrap"><div class="navlabel">Tools</div><nav class="nav">
+      <a href="#" id="calcBtn"><i>Σ</i>Mass calculators</a>
+      <a href="#" id="fmtBtn"><i>⌗</i>Supported files</a>
+      <a href="#" id="codeBtn"><i>&lt;/&gt;</i>View code</a>
+      <a href="#" id="settingsBtn"><i>⚙</i>Settings &amp; API key</a>
+      <a href="#" id="quitBtn" title="Stop the local server (finished analyses stay on disk)"><i>⏻</i>Quit MassSpec Bench</a>
+    </nav></div>
+    <div class="foot">
+      <span>Runs locally · data stays on your Mac</span>
+    </div>
+  </aside>
+
+  <main>
+    <!-- HOME -->
+    <div id="home">
+      <div class="hero">
+        <canvas id="heroCanvas" aria-hidden="true"></canvas>
+        <div class="in">
+          <div>
+            <span class="eyebrow">● pyOpenMS · Sage · ThermoRawFileParser · timsrust · rainbow</span>
+            <h1>From raw spectra to <em>results you can defend</em></h1>
+            <p class="byline">MassSpec Bench — created by <b>Paul H. Kim, Ph.D.</b></p>
+            <p class="lede">Open raw files from the major instrument vendors, look inside them, and run the standard untargeted, proteomics and targeted workflows — with every figure explained in plain language.</p>
+            <div class="stack">
+              <span class="chip">Thermo .raw</span><span class="chip">Bruker timsTOF .d</span><span class="chip">Agilent .d</span><span class="chip">Waters .raw</span><span class="chip">mzML / mzXML</span><span class="chip">MGF</span><span class="chip">ANDI .cdf</span><span class="chip">+ sample sheet</span>
+            </div>
+          </div>
+          <div class="drop">
+            <div class="kinds" id="kinds">
+              <button data-kind="explore" class="on"><b>Explore</b><small>look inside files</small></button>
+              <button data-kind="untargeted"><b>Untargeted</b><small>metabolomics · lipidomics</small></button>
+              <button data-kind="proteomics"><b>Proteomics</b><small>DDA search · LFQ</small></button>
+              <button data-kind="targeted"><b>Targeted</b><small>calibration · quant</small></button>
+            </div>
+            <div class="kinddesc" id="kindDesc"></div>
+            <div class="pickrow">
+              <button class="btn" id="browseBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h6l2 2h10v10H3z"/></svg>Choose files on this Mac</button>
+            </div>
+            <label class="zone small" id="zone" for="fileInput">
+              <b>…or drop mzML / MGF / CSV files here</b>
+              <small>Large vendor files are read in place — use “Choose files” for .raw and .d</small>
+              <input type="file" id="fileInput" multiple hidden>
+            </label>
+            <div id="sheetBox" hidden></div>
+            <details class="settings" id="settings">
+              <summary>Analysis settings</summary>
+              <div class="form" id="kindForm"></div>
+            </details>
+            <div class="hint" id="runHint" style="margin:0 2px;color:var(--warn)"></div>
+            <div class="row" id="confirmRow"><label class="cb"><input type="checkbox" id="confirmChk"> I have checked the samples and settings above</label></div>
+            <button class="btn accent" id="runBtn" disabled style="height:42px">Run analysis</button>
+            <div class="examples">
+              <button class="ex" data-demo="explore"><span class="k">Example</span><b>One LC-MS run</b><small>simulated · 80 compounds · shows the explorer</small></button>
+              <button class="ex" data-demo="untargeted"><span class="k">Example</span><b>Metabolomics study</b><small>simulated · 5 vs 5 + QCs + blank · known answer</small></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feat">
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M6 18V9M10 18V5M14 18v-6M18 18v-9"/></svg><h3>Vendor files, natively</h3><p>Thermo, Bruker timsTOF, Agilent, Waters and ANDI are read on the Mac — no Windows, no conversion step.</p></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17c3 0 3-10 6-10s3 10 6 10 3-6 6-6"/></svg><h3>Interactive raw data</h3><p>Click a chromatogram for its spectrum, a peak for its ion chromatogram across all samples, integrated.</p></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h10M4 19h7"/></svg><h3>Plain-language readouts</h3><p>Every figure says how to read it and what it shows in your data, with flags for drift, contamination and poor curves.</p></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 5l-2 14"/></svg><h3>Assistant &amp; code</h3><p>Ask Claude to explain, re-run or extend an analysis. Every step's source is one click away.</p></div>
+      </div>
+      <div class="recent" id="recentWrap" hidden><h2>Your analyses <span class="hint" id="recentCount"></span></h2>
+        <div class="row" id="recent"></div>
+        <button class="btn sm ghost" id="recentMore" hidden>Show all</button></div>
+    </div>
+
+    <!-- RUNNING -->
+    <div id="running" hidden>
+      <div class="run">
+        <div class="row between"><span class="badge" id="runKind">analysis</span><span class="mono" style="color:var(--muted);font-size:12px" id="runPct">0%</span></div>
+        <h2 style="margin-top:12px" id="runTitle">Analyzing…</h2>
+        <div style="color:var(--muted);margin-top:4px" id="runMsg">Starting</div>
+        <div class="bar"><i id="runBar" style="width:2%"></i></div>
+        <div class="row" style="margin-top:10px"><button class="btn sm" id="stopBtn">Stop this analysis</button></div>
+        <canvas id="runCanvas" class="runcv" aria-hidden="true"></canvas>
+        <ul class="steps" id="runSteps"></ul>
+        <div id="runErr"></div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" hidden></div>
+
+    <!-- CALCULATORS -->
+    <div id="calcs" hidden>
+      <div class="top"><span class="badge">tools</span><h1>Mass calculators</h1></div>
+      <div class="calc">
+        <article class="card"><div class="hd"><div><h3>Formula → m/z</h3><div class="sub">monoisotopic mass, adducts, isotope pattern</div></div></div>
+          <div class="body"><div class="fieldrow"><input type="text" id="cf_formula" value="C6H12O6" style="flex:1" aria-label="Formula"><select id="cf_pol"><option value="1">positive</option><option value="-1">negative</option></select><button class="btn sm accent" id="cf_go">Calculate</button></div>
+          <div class="out" id="cf_out"></div><canvas id="cf_iso" hidden></canvas></div></article>
+        <article class="card"><div class="hd"><div><h3>m/z → what could it be?</h3><div class="sub">neutral mass per adduct, built-in metabolite library</div></div></div>
+          <div class="body"><div class="fieldrow"><input type="text" id="cm_mz" value="181.0707" style="flex:1" aria-label="m/z"><select id="cm_pol"><option value="1">positive</option><option value="-1">negative</option></select><input type="text" id="cm_ppm" value="10" style="width:52px" aria-label="ppm"><span class="hint">ppm</span><button class="btn sm accent" id="cm_go">Search</button></div>
+          <div class="out" id="cm_out"></div></div></article>
+        <article class="card"><div class="hd"><div><h3>Peptide → masses &amp; fragments</h3><div class="sub">b/y ions, carbamidomethyl C</div></div></div>
+          <div class="body"><div class="fieldrow"><input type="text" id="cp_seq" value="SAMPLER" style="flex:1" aria-label="Peptide"><button class="btn sm accent" id="cp_go">Calculate</button></div>
+          <div class="out" id="cp_out"></div></div></article>
+      </div>
+    </div>
+
+    <!-- FORMATS -->
+    <div id="formats" hidden>
+      <div class="top"><span class="badge">files</span><h1>Supported files</h1></div>
+      <p class="lede" style="color:var(--muted);max-width:80ch;margin-top:18px">Mass spectrometers save data in their manufacturer's own format. These are read directly on your Mac; the few that only open on Windows need a one-time conversion to the open mzML format with ProteoWizard <code>msconvert</code>.</p>
+      <div class="fmtgrid" id="fmtGrid"></div>
+    </div>
+  </main>
+</div>
+<div class="tip" id="tip" hidden></div>
+<button class="fab" id="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>Ask Claude</button>
+<aside class="chatwrap" id="chat" aria-label="Assistant">
+  <div class="chat-h"><h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>Assistant <span class="ctx" id="chatCtx"></span></h3>
+    <button class="btn ghost sm" id="chatReset" title="New conversation">↺</button><button class="btn ghost sm" id="chatClose" aria-label="Close">✕</button></div>
+  <div class="chat-b" id="chatBody"><div class="msg ai"><p>I can explain what a result means, re-run an analysis with different settings, or write custom plots and statistics against your data. I only see what's in this app.</p></div></div>
+  <div class="chat-f">
+    <div class="chips" id="chips"></div>
+    <textarea id="chatIn" placeholder="Ask about this analysis, or tell me what to change…"></textarea>
+    <div class="row between"><span class="hint" id="chatHint"></span><button class="btn accent sm" id="chatSend">Send</button></div>
+  </div>
+</aside>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const safe=s=>String(s??"").replace(/<(?!\/?(b|i|code)>)/g,"&lt;");
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const S={kind:"explore",paths:[],rows:[],extra:{},job:null,result:null,poll:null,chatBusy:false};
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+function toast(m){const t=el("div","toast",esc(m));document.body.appendChild(t);setTimeout(()=>t.remove(),3600)}
+const api=async(u,o)=>{const r=await fetch(u,o);if(!r.ok){let m=r.statusText;try{const j=await r.json();m=j.detail||m}catch{try{m=await r.text()}catch{}}throw new Error(m)}return r.json()};
+const post=(u,b)=>api(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});
+const size=b=>b>1e9?(b/1e9).toFixed(1)+" GB":b>1e6?(b/1e6).toFixed(1)+" MB":Math.max(1,Math.round(b/1e3))+" KB";
+const fmt=(v,d=4)=>v==null||!isFinite(v)?"—":(+v).toFixed(d);
+const sci=v=>v==null||!isFinite(v)?"—":Math.abs(v)>=1e5||(Math.abs(v)<1e-2&&v!==0)?(+v).toExponential(2):(+v).toLocaleString(undefined,{maximumFractionDigits:2});
+
+/* theme */
+const DARK_MQ=matchMedia("(prefers-color-scheme: dark)");
+const themeNow=()=>document.documentElement.dataset.theme||(DARK_MQ.matches?"dark":"light");
+function syncThemeSw(){const t=themeNow();$$("#themeSw button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.t===t)))}
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem("theme",t)}catch{}syncThemeSw();window.dispatchEvent(new Event("themechange"))}
+$$("#themeSw button").forEach(b=>{b.onclick=()=>setTheme(b.dataset.t);
+ b.onkeydown=e=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){e.preventDefault();const o=b.dataset.t==="light"?"dark":"light";setTheme(o);$(`#themeSw [data-t="${o}"]`).focus()}}});
+// with no choice made the page follows the Mac's appearance, so redraw the canvases when that changes
+DARK_MQ.addEventListener("change",()=>{if(!document.documentElement.dataset.theme){syncThemeSw();window.dispatchEvent(new Event("themechange"))}});
+// another MassSpec Bench window (or the Toolbox Launcher frame) changed the theme
+window.addEventListener("storage",e=>{if(e.key==="theme"&&(e.newValue==="light"||e.newValue==="dark")&&e.newValue!==document.documentElement.dataset.theme){document.documentElement.dataset.theme=e.newValue;syncThemeSw();window.dispatchEvent(new Event("themechange"))}});
+syncThemeSw();
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COLORS=["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf","#393b79","#e7969c"];
+
+/* Hero: an LC run being acquired — chromatographic peaks rise out of the baseline one after another while
+   the spectrum under the newest peak flickers above them. Kept to the left half; the panel covers the rest. */
+(function hero(){const cv=$("#heroCanvas"),ctx=cv.getContext("2d");let W,H,pk=[],t0=performance.now();
+ const cols=["#00e0cf","#ffb020","#ff5c8a","#4ea3ff","#b27bff","#2ee6a8","#ffd23f"];
+ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ function init(){const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  pk=[];let x=0.04;while(x<0.95){pk.push({x,h:0.15+0.75*Math.random()**1.6,w:0.006+0.012*Math.random(),c:cols[pk.length%cols.length],
+   sp:Array.from({length:14},()=>({m:Math.random(),i:Math.random()**3}))});x+=0.02+0.05*Math.random()}}
+ function frame(now){const dur=9000,p=reduce?1:((now-t0)%dur)/dur;ctx.clearRect(0,0,W,H);
+  const x0=W*0.03,x1=W*0.5,base=H*0.93,top=H*0.5;const xe=x0+(x1-x0)*Math.min(1,p*1.15);
+  ctx.lineWidth=1.3;
+  for(const q of pk){const cx=x0+(x1-x0)*q.x;if(cx>xe)break;ctx.beginPath();ctx.strokeStyle=q.c;ctx.globalAlpha=.55;
+   for(let x=cx-(x1-x0)*q.w*3;x<=Math.min(xe,cx+(x1-x0)*q.w*3);x+=1.5){const u=(x-cx)/((x1-x0)*q.w);const y=base-(base-top)*q.h*Math.exp(-.5*u*u);x===cx-(x1-x0)*q.w*3?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()}
+  ctx.globalAlpha=.35;ctx.strokeStyle=css("--muted");ctx.beginPath();ctx.moveTo(x0,base);ctx.lineTo(xe,base);ctx.stroke();
+  const cur=[...pk].reverse().find(q=>x0+(x1-x0)*q.x<=xe);
+  if(cur){ctx.globalAlpha=.8;ctx.strokeStyle=cur.c;ctx.lineWidth=2;const sy=H*0.42,sh=H*0.3;
+   for(const s of cur.sp){const x=x0+(x1-x0)*(0.05+0.9*s.m);ctx.beginPath();ctx.moveTo(x,sy);ctx.lineTo(x,sy-sh*s.i*(0.9+0.1*Math.sin(now/200+s.m*9)));ctx.stroke()}
+   ctx.globalAlpha=.3;ctx.lineWidth=1;ctx.strokeStyle=css("--muted");ctx.beginPath();ctx.moveTo(x0,sy);ctx.lineTo(x1,sy);ctx.stroke()}
+  ctx.globalAlpha=1;if(!reduce&&!$("#home").hidden)requestAnimationFrame(frame)}
+ init();requestAnimationFrame(frame);new ResizeObserver(()=>{init();requestAnimationFrame(frame)}).observe(cv);
+ window.__heroRestart=()=>requestAnimationFrame(frame)})();
+
+/* Running view: a chromatogram drawn left to right as far as the analysis has actually got. */
+(function runViz(){const cv=$("#runCanvas"),ctx=cv.getContext("2d");let W=0,H,pk=[],shown=0;
+ function init(){const r=cv.getBoundingClientRect();if(!r.width)return;W=r.width;H=r.height;cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  pk=Array.from({length:26},()=>({x:Math.random(),h:.1+.85*Math.random()**2,w:.004+.01*Math.random(),c:COLORS[Math.floor(Math.random()*6)]}))}
+ function frame(){if(!W){init();if(!W){requestAnimationFrame(frame);return}}
+  shown+=(Math.min(1,(window.__runPct||0)/100)-shown)*.05;ctx.clearRect(0,0,W,H);const b=H*.9,xe=W*shown;
+  for(const q of pk){const cx=W*q.x;if(cx-W*q.w*3>xe)continue;ctx.beginPath();ctx.strokeStyle=q.c;ctx.globalAlpha=.7;ctx.lineWidth=1.4;
+   for(let x=cx-W*q.w*3;x<=Math.min(xe,cx+W*q.w*3);x+=1){const u=(x-cx)/(W*q.w);const y=b-H*.8*q.h*Math.exp(-.5*u*u);x<=cx-W*q.w*3+1?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()}
+  ctx.globalAlpha=.4;ctx.strokeStyle=css("--muted");ctx.beginPath();ctx.moveTo(0,b);ctx.lineTo(xe,b);ctx.stroke();ctx.globalAlpha=1;
+  if(!$("#running").hidden)requestAnimationFrame(frame)}
+ new ResizeObserver(()=>{W=0}).observe(cv);window.__runVizStart=()=>{shown=0;requestAnimationFrame(frame)}})();
+
+/* ------------------------------------------------------------------ analysis types and their settings */
+const KINDS={
+ explore:{label:"Raw data overview",desc:"What is in each file: chromatograms, LC-MS maps, MS/MS acquisition, contaminants and mass accuracy — plus the interactive explorer. Start here with any new data.",
+  needs:"one or more data files",fields:[]},
+ untargeted:{label:"Untargeted LC-MS",desc:"Metabolomics / lipidomics: feature detection, RT alignment, gap filling, blank and QC filtering, drift correction, normalisation, PCA, group statistics and m/z annotation. Mark QCs and blanks in the sample table and give samples a group.",
+  needs:"several runs of one polarity, ideally with pooled QCs and a blank",fields:[
+  {key:"mass_error_ppm",label:"Mass tolerance (ppm)",type:"number",placeholder:"10"},
+  {key:"normalisation",label:"Normalisation",type:"select",options:["","pqn","median","tic","none"],placeholder:"PQN"},
+  {key:"blank_ratio",label:"Blank filter: sample / blank ≥",type:"number",placeholder:"3"},
+  {key:"qc_cv_max",label:"QC CV filter (%)",type:"number",placeholder:"30"},
+  {key:"group_a",label:"Reference group",type:"text",placeholder:"auto (first in sheet)"},
+  {key:"group_b",label:"Compared group",type:"text",placeholder:"auto"},
+  {key:"library",label:"Your compound list (CSV: name, formula or mass, rt)",type:"file",full:true},
+  {key:"msp_library",label:"Spectral library for MS/MS matching (.msp / .mgf)",type:"file",full:true}]},
+ proteomics:{label:"Proteomics (DDA)",desc:"Bottom-up proteomics: Sage database search with target–decoy FDR, peptide and protein identification QC, label-free (or TMT) protein quantification and a moderated t-test between groups. Needs a protein FASTA, or pick an organism to download one from UniProt.",
+  needs:"DDA runs (mzML, Thermo .raw or Bruker .d) and a FASTA",fields:[
+  {key:"fasta",label:"Protein database (FASTA)",type:"file",full:true},
+  {key:"organism",label:"…or download from UniProt",type:"select",options:["","human","mouse","yeast","ecoli"],placeholder:"none"},
+  {key:"precursor_tol",label:"Precursor tolerance (ppm)",type:"number",placeholder:"10"},
+  {key:"fragment_tol",label:"Fragment tolerance",type:"number",placeholder:"auto from data"},
+  {key:"fragment_unit",label:"Fragment tolerance unit",type:"select",options:["","ppm","da"],placeholder:"auto"},
+  {key:"missed_cleavages",label:"Missed cleavages",type:"number",placeholder:"2"},
+  {key:"tmt",label:"TMT labels",type:"select",options:["","tmt6","tmt10","tmt11","tmt16","tmt18"],placeholder:"none (label-free)"},
+  {key:"enzyme",label:"Enzyme",type:"select",options:["","trypsin","trypsin/p","lys-c","chymotrypsin","glu-c","asp-n"],placeholder:"trypsin"},
+  {key:"group_a",label:"Reference group",type:"text",placeholder:"auto (first in sheet)"},
+  {key:"group_b",label:"Compared group",type:"text",placeholder:"auto"}]},
+ targeted:{label:"Targeted quantification",desc:"Integrate a list of compounds (full-scan XIC, PRM or SRM/MRM transitions) in every sample, fit calibration curves from standards of known concentration, and back-calculate the unknowns with LOD/LOQ and QC accuracy.",
+  needs:"runs + a target list; standards with a concentration in the sample table",fields:[
+  {key:"targets",label:"Target list (CSV/XLSX: name, mz or formula+adduct or q1/q3, rt, istd)",type:"file",full:true},
+  {key:"targets_text",label:"…or paste it",type:"textarea",full:true,placeholder:"name,formula,adduct,rt\ncaffeine,C8H10N4O2,[M+H]+,4.2"},
+  {key:"ppm",label:"Mass tolerance (ppm)",type:"number",placeholder:"10"},
+  {key:"rt_window",label:"RT window (± min)",type:"number",placeholder:"0.5"},
+  {key:"weighting",label:"Curve weighting",type:"select",options:["","1/x","1/x2","none"],placeholder:"1/x"},
+  {key:"model",label:"Curve model",type:"select",options:["","linear","quadratic"],placeholder:"linear"}]},
+};
+function renderKind(){
+ $$("#kinds button").forEach(b=>b.classList.toggle("on",b.dataset.kind===S.kind));
+ const K=KINDS[S.kind];$("#kindDesc").innerHTML=`${esc(K.desc)}<br><span class="hint">Needs: ${esc(K.needs)}.</span>`;
+ const f=$("#kindForm");f.innerHTML=K.fields.length?"":`<p class="hint full" style="margin:0">The overview has no settings — it describes the files as recorded.</p>`;
+ for(const d of K.fields){const lab=el("label",d.full?"full":"");lab.append(d.label);let inp;
+  if(d.type==="select"){inp=el("select");inp.innerHTML=d.options.map(o=>`<option value="${esc(o)}">${esc(o||("default: "+d.placeholder))}</option>`).join("")}
+  else if(d.type==="textarea"){inp=el("textarea","targets");inp.placeholder=d.placeholder||""}
+  else if(d.type==="file"){inp=el("div","fieldrow");inp.innerHTML=`<input type="text" placeholder="none — path to a file" readonly><button class="btn sm" type="button">Choose…</button><button class="btn ghost sm" type="button" title="Clear">✕</button>`;
+   const [t,b,x]=inp.children;t.value=S.extra[d.key]||"";b.onclick=()=>openBrowser({single:true,title:d.label,onPick:p=>{S.extra[d.key]=p[0];t.value=p[0];clearConfirm()}});x.onclick=()=>{delete S.extra[d.key];t.value="";clearConfirm()}}
+  else{inp=el("input");inp.type=d.type==="number"?"number":"text";inp.placeholder=d.placeholder||"";inp.step="any"}
+  if(d.type!=="file")inp.id="f_"+d.key;lab.appendChild(inp);f.appendChild(lab)}
+ renderSheet();syncRun()}
+$$("#kinds button").forEach(b=>b.onclick=()=>{S.kind=b.dataset.kind;renderKind();clearConfirm(true)});
+function collectParams(){const p={};for(const d of KINDS[S.kind].fields){if(d.type==="file"){if(S.extra[d.key])p[d.key]=S.extra[d.key];continue}
+  const e=$("#f_"+d.key);if(!e)continue;const v=e.value.trim();if(v==="")continue;p[d.key]=d.type==="number"?+v:v}
+ p.sheet=S.rows.map(r=>({file:r.file,sample:r.sample,group:r.group,type:r.type,batch:r.batch,order:+r.order,concentration:r.concentration===""||r.concentration==null?null:+r.concentration}));return p}
+
+/* ------------------------------------------------------------------ choosing data */
+async function addPaths(ps){for(const p of ps)if(!S.paths.includes(p))S.paths.push(p);await inspect()}
+async function inspect(sheet){
+ if(!S.paths.length){S.rows=[];renderSheet();syncRun();return}
+ try{const j=await post("/api/inspect",{paths:S.paths,sheet:sheet||S.sheet||null});
+  // keep edits the user already made to rows that are still there
+  const old=Object.fromEntries(S.rows.map(r=>[r.file,r]));
+  S.rows=j.rows.map(r=>old[r.file]&&!sheet?old[r.file]:r);S.sheet=j.sheet;S.problems=j.problems;S.other=j.other;
+  for(const o of j.other){if(/\.(fasta|fa)$/i.test(o))S.extra.fasta=o;if(/\.msp$/i.test(o))S.extra.msp_library=o}
+ }catch(e){toast("Could not read those files: "+e.message)}
+ renderSheet();renderKind()}
+function renderSheet(){const B=$("#sheetBox");if(!S.paths.length){B.hidden=true;return}B.hidden=false;
+ const showConc=S.kind==="targeted",n=S.rows.length;
+ const grp=[...new Set(S.rows.filter(r=>r.type==="sample"&&r.group).map(r=>r.group))];
+ B.innerHTML=`<div class="sheet"><div class="sh"><b>${n} data file${n!==1?"s":""}</b><span class="hint">${S.sheet?"sheet: "+esc(S.sheet.split("/").pop()):"no sample sheet"} · ${grp.length?grp.length+" groups: "+esc(grp.join(", ")):"no groups yet"}</span>
+  <span style="margin-left:auto;display:flex;gap:4px"><button class="btn ghost sm" id="shLoad" title="CSV/XLSX with columns file, sample, group, type (sample/qc/blank/standard), order, batch, concentration">Load sheet…</button><button class="btn ghost sm" id="shGuess" title="Use the part of each file name before the last _ or number as its group">Groups from names</button><button class="btn ghost sm" id="shClear">Clear</button></span></div>
+  <div class="tscroll"><table><thead><tr><th>File</th><th>Sample</th><th>Type</th><th>Group</th><th>Order</th>${showConc?"<th>Conc.</th>":""}<th></th></tr></thead><tbody>${S.rows.map((r,i)=>`<tr class="type-${r.type}">
+   <td class="fn ${r.supported===false?"bad":""}" title="${esc(r.file)} · ${esc(r.format||"")}">${esc(r.file.split("/").pop())}</td>
+   <td><input data-i="${i}" data-k="sample" value="${esc(r.sample)}"></td>
+   <td><select data-i="${i}" data-k="type">${["sample","qc","blank","standard"].map(t=>`<option ${t===r.type?"selected":""}>${t}</option>`).join("")}</select></td>
+   <td><input data-i="${i}" data-k="group" value="${esc(r.group||"")}" placeholder="${r.type==="sample"?"group":"—"}"></td>
+   <td><input data-i="${i}" data-k="order" value="${esc(r.order)}" style="width:52px;min-width:0"></td>
+   ${showConc?`<td><input data-i="${i}" data-k="concentration" value="${esc(r.concentration??"")}" placeholder="${r.type==="standard"?"required":""}" style="width:70px;min-width:0"></td>`:""}
+   <td><button class="btn ghost sm" data-rm="${i}" aria-label="Remove">✕</button></td></tr>`).join("")}</tbody></table></div>
+  ${(S.problems||[]).length?`<div class="probs">${S.problems.map(esc).join("<br>")}</div>`:""}</div>`;
+ B.querySelectorAll("[data-k]").forEach(e=>e.addEventListener("change",()=>{const r=S.rows[+e.dataset.i];r[e.dataset.k]=e.value;if(e.dataset.k==="type")renderSheet();clearConfirm();syncRun()}));
+ B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const r=S.rows[+b.dataset.rm];S.rows.splice(+b.dataset.rm,1);S.paths=S.paths.filter(p=>p!==r.file&&!r.file.startsWith(p+"/")||S.rows.some(x=>x.file.startsWith(p)));renderSheet();syncRun()});
+ $("#shLoad").onclick=()=>openBrowser({single:true,title:"Sample sheet (CSV / XLSX)",onPick:p=>inspect(p[0])});
+ $("#shGuess").onclick=()=>{S.rows.forEach(r=>{if(r.type!=="sample")return;const g=r.sample.replace(/[_\-\s.]*(rep|r|s|n)?\d+$/i,"").replace(/[_\-\s.]+$/,"");if(g&&g!==r.sample)r.group=g});renderSheet();toast("Groups set from file names — check them before running.")};
+ $("#shClear").onclick=()=>{S.paths=[];S.rows=[];S.sheet=null;S.problems=[];renderSheet();syncRun()}}
+function syncRun(){const ok=$("#confirmChk").checked,n=S.rows.filter(r=>r.supported!==false).length;let hint="";
+ if(S.kind==="proteomics"&&n&&!S.extra.fasta&&!($("#f_organism")?.value))hint="Proteomics needs a FASTA file or an organism to download.";
+ if(S.kind==="targeted"&&n&&!S.extra.targets&&!($("#f_targets_text")?.value.trim()))hint="Targeted quantification needs a target list.";
+ $("#runHint").textContent=hint;$("#runBtn").disabled=!n||!ok||!!hint;
+ $("#runBtn").textContent=n?`Run ${KINDS[S.kind].label.toLowerCase()} on ${n} file${n!==1?"s":""}`:"Run analysis"}
+function clearConfirm(silent){if($("#confirmChk").checked){$("#confirmChk").checked=false;if(!silent)toast("Settings changed — confirm them again before running.")}syncRun()}
+$("#confirmChk").onchange=()=>{syncRun();$("#confirmRow").classList.remove("need")};
+$("#settings").addEventListener("input",()=>clearConfirm());
+$("#browseBtn").onclick=()=>openBrowser({title:"Choose data files",onPick:addPaths});
+const zone=$("#zone");
+["dragenter","dragover"].forEach(t=>zone.addEventListener(t,e=>{e.preventDefault();zone.classList.add("over")}));
+["dragleave","drop"].forEach(t=>zone.addEventListener(t,e=>{e.preventDefault();zone.classList.remove("over")}));
+zone.addEventListener("drop",e=>uploadFiles(e.dataTransfer.files));
+$("#fileInput").onchange=e=>{uploadFiles(e.target.files);e.target.value=""};
+async function uploadFiles(fl){if(!fl.length)return;const fd=new FormData();let tot=0;for(const f of fl){fd.append("files",f,f.webkitRelativePath||f.name);tot+=f.size}
+ toast(`Copying ${fl.length} file${fl.length>1?"s":""} (${size(tot)}) into the app…`);
+ try{const j=await api("/api/upload",{method:"POST",body:fd});const data=[],side=[];
+  for(const p of j.paths){if(/\.(csv|tsv|txt|xlsx)$/i.test(p))side.push(p);else if(/\.(fasta|fa)$/i.test(p))S.extra.fasta=p;else if(/\.msp$/i.test(p))S.extra.msp_library=p;else data.push(p)}
+  if(side.length&&S.kind==="targeted"&&!S.extra.targets&&/target|transition|compound/i.test(side[0]))S.extra.targets=side.shift();
+  S.paths.push(...data);await inspect(side[0])}catch(e){toast("Upload failed: "+e.message)}}
+
+/* file browser: the server lists folders on this Mac; vendor .d/.raw folders count as one data file */
+async function openBrowser({title,single,onPick}){
+ const m=el("div","modal");m.innerHTML=`<div class="box fb"><h3>${esc(title||"Choose files")}</h3>
+  <div class="roots"></div><div class="fbbar"><button class="btn sm" data-up title="Parent folder">↑</button><input type="text" aria-label="Folder path"><button class="btn sm" data-go>Go</button></div>
+  <div class="list" role="listbox"></div>
+  <div class="row between"><span class="hint" data-n></span><span class="row"><button class="btn sm" data-all ${single?"hidden":""}>Select all data files here</button><button class="btn" data-cancel>Cancel</button><button class="btn accent" data-ok disabled>${single?"Use this file":"Add selected"}</button></span></div></div>`;
+ document.body.appendChild(m);const q=s=>m.querySelector(s);let cur=store.get("lastDir",""),sel=new Set(),data=null;
+ const close=()=>m.remove();q("[data-cancel]").onclick=close;m.onclick=e=>{if(e.target===m)close()};
+ const upd=()=>{q("[data-ok]").disabled=!sel.size;q("[data-n]").textContent=sel.size?`${sel.size} selected`:(single?"Click a file":"Tick data files, or a folder of runs")};
+ async function load(p){try{data=await api("/api/browse?path="+encodeURIComponent(p||""))}catch(e){toast(e.message);if(p){store.set("lastDir","");return load("")}return}
+  cur=data.path;store.set("lastDir",cur);q(".fbbar input").value=cur;
+  q(".roots").innerHTML=data.roots.map(r=>`<button data-p="${esc(r.path)}">${esc(r.name)}</button>`).join("");
+  q(".roots").querySelectorAll("button").forEach(b=>b.onclick=()=>load(b.dataset.p));
+  const L=q(".list");L.innerHTML=data.items.map((it,i)=>it.dir?`<div class="it" data-i="${i}"><span></span><span>📁</span><span class="nm">${esc(it.name)}</span><span></span><span></span></div>`:
+   `<div class="it ${it.ms&&!it.supported?"dim":""}" data-i="${i}"><input type="${single?"radio":"checkbox"}" name="fbp" ${sel.has(it.path)?"checked":""} tabindex="-1"><span>${it.ms?"◆":"·"}</span><span class="nm">${esc(it.name)}</span><span class="fm ${it.ms&&!it.supported?"no":""}">${esc(it.format||"")}</span><span class="sz">${size(it.size)}</span></div>`).join("")||`<p class="hint" style="padding:14px">No folders or mass-spec files here.</p>`;
+  L.querySelectorAll(".it").forEach(r=>r.onclick=()=>{const it=data.items[+r.dataset.i];if(it.dir){load(it.path);return}
+   if(single){sel=new Set([it.path]);L.querySelectorAll("input").forEach(x=>x.checked=false)}else if(sel.has(it.path))sel.delete(it.path);else sel.add(it.path);
+   r.querySelector("input").checked=sel.has(it.path);upd()});
+  L.querySelectorAll(".it").forEach(r=>r.ondblclick=()=>{const it=data.items[+r.dataset.i];if(!it.dir&&single){sel=new Set([it.path]);q("[data-ok]").click()}});upd()}
+ q("[data-up]").onclick=()=>data&&data.parent&&load(data.parent);q("[data-go]").onclick=()=>load(q(".fbbar input").value);
+ q(".fbbar input").onkeydown=e=>{if(e.key==="Enter")load(e.target.value)};
+ q("[data-all]").onclick=()=>{data.items.filter(i=>i.ms&&i.supported).forEach(i=>sel.add(i.path));load(cur)};
+ q("[data-ok]").onclick=()=>{close();onPick([...sel])};load(cur)}
+
+/* ------------------------------------------------------------------ run */
+function settingsOK(){if($("#confirmChk").checked)return true;$("#settings").open=true;$("#confirmRow").classList.add("need");$("#confirmRow").scrollIntoView({block:"center",behavior:"smooth"});setTimeout(()=>$("#confirmRow").classList.remove("need"),700);toast("Check the samples and settings, then tick the box to start.");return false}
+$("#runBtn").onclick=async()=>{if(!settingsOK())return;const rows=S.rows.filter(r=>r.supported!==false);
+ if(S.kind==="untargeted"||S.kind==="proteomics"){const g=new Set(rows.filter(r=>r.type==="sample"&&r.group).map(r=>r.group));
+  if(g.size<2&&!confirm("No two groups are set in the sample table, so the analysis will stop before any group comparison. Run anyway?"))return}
+ if(S.kind==="targeted"&&!rows.some(r=>r.type==="standard"&&r.concentration!==""&&r.concentration!=null)&&!confirm("No calibration standard has a concentration, so results will be peak areas, not concentrations. Run anyway?"))return;
+ showRunning(S.kind,"Starting…");
+ try{const j=await post("/api/analyze",{kind:S.kind,paths:rows.map(r=>r.file),params:collectParams()});startPoll(j.job,j.kind)}catch(e){runError("Could not start: "+e.message)}};
+$$("[data-demo]").forEach(b=>b.onclick=async()=>{showRunning(b.dataset.demo,"Preparing the example (the first time it is simulated, ~1 min)…");
+ try{const j=await api("/api/demo/"+b.dataset.demo,{method:"POST"});startPoll(j.job,j.kind)}catch(e){runError(e.message)}});
+$("#newBtn").onclick=$("#homeLink").onclick=e=>{e.preventDefault();go("home")};
+/* Each analysis is a history entry (#job=…), so Back and Forward move between analyses and home. */
+function setHash(h,fromHistory){if(fromHistory||location.hash===h||(h==="#"&&!location.hash))return;history.pushState(null,"",h||"#")}
+function go(view,fromHistory){for(const v of["home","running","results","calcs","formats"])$("#"+v).hidden=v!==view;$("#navWrap").hidden=$("#dlWrap").hidden=view!=="results";if(view==="home"){setHash("#",fromHistory);renderRecent();window.__heroRestart()}window.scrollTo(0,0)}
+
+const KLABEL={explore:"overview",untargeted:"untargeted",proteomics:"proteomics",targeted:"targeted"};
+const whenLabel=t=>{const d=new Date(t),now=new Date();return d.toDateString()===now.toDateString()?d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):d.toLocaleDateString([],{month:"short",day:"numeric"})};
+const sumLabel=(x)=>{const s=x.summary||{};return s.headline?s.headline:s.features!=null?`${s.features} features`:s.proteins!=null?`${s.proteins} proteins`:s.targets!=null?`${s.targets} targets`:s.spectra!=null?`${(+s.spectra).toLocaleString()} spectra`:`${x.files||""} files`};
+let RECENT_ALL=false;
+async function renderRecent(){let rows=[];try{rows=await api("/api/jobs")}catch{}
+ $("#recentWrap").hidden=!rows.length;if(!rows.length)return;const show=RECENT_ALL?rows:rows.slice(0,6);
+ $("#recentCount").textContent=rows.length>6?`· ${rows.length} total`:"";$("#recentMore").hidden=rows.length<=6;$("#recentMore").textContent=RECENT_ALL?"Show fewer":`Show all ${rows.length}`;
+ $("#recent").innerHTML="";show.forEach(x=>{const err=x.state==="error",run=x.state==="running",stop=x.state==="cancelled";
+  const b=el("button","ex"+(err||stop?" dim":""),`<span class="k">${esc(KLABEL[x.kind]||x.kind)}</span><b>${esc(x.name)}</b><small>${esc(stop?"you stopped this one":err?"could not finish":run?"still running":sumLabel(x))}</small><small class="mono" style="opacity:.55">${esc(x.job)} · ${esc(whenLabel(x.t))}</small>`);
+  b.style.maxWidth="280px";b.title=err?(x.error||""):"Open "+x.name;b.onclick=()=>err||stop?toast(x.error||"That analysis did not finish."):loadResult(x.job);$("#recent").appendChild(b)})}
+$("#recentMore").onclick=()=>{RECENT_ALL=!RECENT_ALL;renderRecent()};
+async function sideRecent(){let rows=[];try{rows=await api("/api/jobs?limit=8")}catch{}rows=rows.filter(x=>x.state==="done").slice(0,5);
+ $("#sideRecentWrap").hidden=!rows.length;$("#sideRecent").innerHTML=rows.map(x=>`<a href="#job=${esc(x.job)}" data-job="${esc(x.job)}" title="${esc(x.name)}"><i>${{explore:"◎",untargeted:"◆",proteomics:"≋",targeted:"◉"}[x.kind]||"·"}</i><span>${esc(x.name)}<small>${esc(KLABEL[x.kind]||"")} · ${esc(whenLabel(x.t))}</small></span></a>`).join("");
+ $$("#sideRecent a").forEach(a=>a.onclick=e=>{e.preventDefault();loadResult(a.dataset.job)})}
+
+const STEPS={explore:[[2,"Read raw files"],[45,"Chromatograms & maps"],[70,"Acquisition & peaks"],[85,"Contaminants & mass accuracy"],[98,"PDF report"]],
+ untargeted:[[2,"Read & centroid raw files"],[25,"Feature detection"],[45,"RT alignment & linking"],[55,"Gap filling"],[65,"Annotation"],[72,"Blank / QC filtering & drift correction"],[82,"Normalisation, PCA, statistics"],[98,"PDF report"]],
+ proteomics:[[2,"Read raw files"],[15,"Sage database search"],[50,"FDR & identification QC"],[65,"Protein quantification"],[80,"Differential abundance"],[98,"PDF report"]],
+ targeted:[[2,"Read raw files"],[25,"Extract & integrate targets"],[55,"Calibration curves"],[75,"Quantify samples"],[98,"PDF report"]]};
+function showRunning(kind,msg){go("running");$("#stopBtn").hidden=false;window.__runPct=0;window.__runVizStart&&window.__runVizStart();S.runKind=kind;$("#runKind").textContent=KINDS[kind]?.label||kind;$("#runTitle").textContent="Analyzing your data";$("#runErr").innerHTML="";updRun({pct:1,message:msg})}
+function sideRunning(st){const c=$("#sideRunning");if(!st){c.hidden=true;return}c.hidden=false;$("#jr_kind").textContent=(KINDS[S.runKind]?.label||"analysis");$("#jr_pct").textContent=Math.round(st.pct||0)+"%";$("#jr_msg").textContent=st.message||"";$("#jr_bar").style.width=Math.max(2,st.pct||0)+"%"}
+$("#jr_open").onclick=()=>go("running");
+async function stopJob(){const job=S.runJob;if(!job)return;if(!confirm("Stop this analysis? The run will not finish."))return;try{await fetch(`/api/jobs/${job}/cancel`,{method:"POST"});toast("Stopping at the end of the current step…")}catch{toast("Could not reach the server.")}}
+$("#jr_stop").onclick=stopJob;$("#stopBtn").onclick=stopJob;
+function updRun(s){sideRunning(s);window.__runPct=s.pct||0;$("#runBar").style.width=Math.max(2,s.pct)+"%";$("#runPct").textContent=Math.round(s.pct)+"%";$("#runMsg").textContent=s.message;
+ const st=STEPS[S.runKind]||STEPS.explore;$("#runSteps").innerHTML=st.map(([p,l],i)=>{const next=st[i+1]?st[i+1][0]:101;const cls=s.pct>=next||s.state==="done"?"done":s.pct>=p?"now":"";return`<li class="${cls}"><i></i>${l}</li>`}).join("")}
+function runError(m,trace){$("#runTitle").textContent="Analysis stopped";$("#stopBtn").hidden=true;$("#runErr").innerHTML=`<div class="errbox">${esc(m)}</div>${trace?`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted)">Technical details (copy this when reporting a problem)</summary><pre style="white-space:pre-wrap;font-size:11px;max-height:320px;overflow:auto;background:var(--panel2);padding:10px;border-radius:8px">${esc(trace)}</pre></details>`:""}<div class="row" style="margin-top:12px"><button class="btn" onclick="go('home')">Back</button></div>`}
+function startPoll(job,kind){S.runKind=kind;S.runJob=job;clearInterval(S.poll);setHash("#job="+job);
+ S.poll=setInterval(async()=>{try{const r=await fetch(`/api/jobs/${job}/status`);if(!r.ok)return;const s=await r.json();updRun(s);
+  if(s.state==="done"){clearInterval(S.poll);sideRunning(null);S.runJob=null;sideRecent();loadResult(job)}
+  else if(s.state==="cancelled"){clearInterval(S.poll);sideRunning(null);S.runJob=null;runError("You stopped this analysis.")}
+  else if(s.state==="error"){clearInterval(S.poll);sideRunning(null);S.runJob=null;runError(s.error||"Unknown error",s.trace)}}catch{}},900)}
+
+/* ------------------------------------------------------------------ results */
+const F=(job,p)=>`/api/jobs/${job}/files/${p}`;
+async function loadResult(job,fromHistory){let res;try{res=await api(`/api/jobs/${job}/result`)}catch{try{const st=await api(`/api/jobs/${job}/status`);if(st.state==="running"){showRunning(S.runKind||"explore",st.message);startPoll(job,S.runKind||"explore");return}}catch{}toast("That analysis is no longer available.");go("home");return}
+ S.job=job;S.result=res;setHash("#job="+job,fromHistory);renderResults(res);go("results")}
+function route(){const m=location.hash.match(/^#job=(\w+)/);
+ if(m){if(m[1]!==S.job||$("#results").hidden)loadResult(m[1],true)}
+ else if(!location.hash||location.hash==="#"){if($("#home").hidden)go("home",true)}}
+window.addEventListener("popstate",route);window.addEventListener("hashchange",route);
+function renderResults(R){const job=S.job,root=$("#results");root.innerHTML="";
+ const top=el("div","top");top.innerHTML=`<span class="badge">${esc(KINDS[R.kind]?.label||R.kind)}</span><h1 title="${esc(R.name)}">${esc(R.name)}</h1>
+  <button class="btn sm" id="codeBtn2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 5l-2 14"/></svg>View code</button>
+  ${(R.params_panel||[]).some(g=>g.fields.some(f=>f.type!=="fixed"&&!f.key.startsWith("_")))?`<button class="btn sm" id="tuneBtn">Parameters</button>`:""}
+  <a class="btn sm accent" href="${F(job,"report.pdf")}" download>PDF report</a>`;
+ root.appendChild(top);top.querySelector("#codeBtn2").onclick=()=>openCode();const tb=top.querySelector("#tuneBtn");if(tb)tb.onclick=()=>document.getElementById("params")?.scrollIntoView({behavior:"smooth"});
+ $("#chatCtx").textContent=R.name;setChips(R);
+ const tiles=el("div","tiles");tiles.innerHTML=R.tiles.map(t=>`<div class="tile"><b style="${String(t.value).length>10?"font-size:17px":""}">${esc(t.value)}</b><span>${esc(t.label)}</span></div>`).join("");root.appendChild(tiles);
+ const ins=el("div","insights");ins.id="summary";ins.innerHTML=`<h2>What your data says</h2>`+R.flags.map(f=>`<div class="insight"><span class="tag ${f.level}">${{ok:"OK",warn:"CHECK",info:"NOTE"}[f.level]}</span><div>${safe(f.text)}</div></div>`).join("");root.appendChild(ins);
+ const navItems=[["summary","Summary"]];
+ S.explorer=null;
+ // every analysis that read raw files gets the explorer, so rows of its tables can open their raw traces
+ const sections=R.sections.slice(),hasX=sections.some(s=>s.items.some(i=>i.type==="ms_explorer"||i.type==="explorer"));
+ if(!hasX&&(R.runs||[]).length){const k=sections.findIndex(s=>s.items.some(i=>["feature_table","psm_table","target_review"].includes(i.type)));
+  const xs={id:"raw",kicker:"Interactive",title:"Raw data",lede:"The files behind this analysis. Click a row in the tables to see its ion chromatogram or spectrum here; click the chromatogram for the spectrum at that time.",items:[{type:"ms_explorer",title:"Raw data explorer"}]};
+  sections.splice(k>=0?k+1:sections.length,0,xs)}
+ sections.forEach(s=>{navItems.push([s.id,s.title]);const sec=el("section","sec");sec.id=s.id;
+  sec.innerHTML=`<div class="sech"><span class="k">${esc(s.kicker)}</span><h2>${esc(s.title)}</h2></div><p class="lede">${safe(s.lede)}</p>`;const g=el("div","grid");sec.appendChild(g);
+  s.items.forEach(it=>{const w=WIDGETS[it.type];if(w)g.appendChild(w(it,job,R))});root.appendChild(sec)});
+ const editable=(R.params_panel||[]).some(g=>g.fields.some(f=>f.type!=="fixed"&&!f.key.startsWith("_")));
+ if(editable){navItems.push(["params","Parameters"]);root.appendChild(paramsSection(R))}
+ const m=el("section","sec");m.id="methods";navItems.push(["methods","Methods"]);m.innerHTML=`<div class="sech"><span class="k">Reproducibility</span><h2>Methods</h2></div><p class="lede">What was computed and with which software, ready to adapt for a methods section.</p><div class="methods">${R.methods.map(([h,p])=>`<div><h4>${esc(h)}</h4><p>${safe(p)}</p></div>`).join("")}</div><div class="versions">${Object.entries(R.versions||{}).map(([k,v])=>`<span class="chip">${esc(k)} ${esc(v)}</span>`).join("")}</div>`;root.appendChild(m);
+ $("#nav").innerHTML=navItems.map(([id,l],i)=>`<a href="#${id}" data-id="${id}"><i>${i===0?"◎":i===navItems.length-1?"≡":i}</i>${esc(l)}</a>`).join("");
+ $$("#nav a").forEach(a=>a.onclick=e=>{e.preventDefault();document.getElementById(a.dataset.id).scrollIntoView({behavior:"smooth"})});
+ const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)$$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.id===e.target.id))})},{rootMargin:"-30% 0px -60% 0px"});navItems.forEach(([id])=>{const n=document.getElementById(id);if(n)obs.observe(n)});
+ $("#dl").innerHTML=[{label:"PDF report",href:"report.pdf"},...(R.downloads||[])].map(d=>`<a href="${F(job,d.href)}" download><span>${esc(d.label)}</span><span>${esc(d.href.split(".").pop())}</span></a>`).join("")}
+function figCard(it,job){const c=el("article","card"+(it.wide?" wide":""));const src=F(job,it.src);
+ c.innerHTML=`<div class="hd"><div><h3>${esc(it.title)}</h3>${it.sub?`<div class="sub">${esc(it.sub)}</div>`:""}</div><div class="act">${it.vector?`<a class="btn ghost sm vec" href="${F(job,it.vector)}" download="${esc(it.id)}.pdf" title="Vector PDF — text stays editable">PDF</a>`:""}<a class="btn ghost sm" href="${src}" download="${esc(it.id)}.png" title="Download PNG">PNG</a></div></div>
+ <div class="fig"><img loading="lazy" src="${src}" alt="${esc(it.title)}"></div><div class="ft">${it.how?`<div class="how">${safe(it.how)}</div>`:""}${it.yours?`<div class="yours">${safe(it.yours)}</div>`:""}</div>`;
+ c.querySelector(".fig").onclick=()=>{const lb=el("div","lightbox",`<img src="${src}" alt="">`);lb.onclick=()=>lb.remove();document.body.appendChild(lb)};return c}
+function tableCard(it,job,onRow){const c=el("article","card wide");let sortCol=-1,dir=1,q="";
+ c.innerHTML=`<div class="hd"><div><h3>${esc(it.title)}</h3><div class="sub">${it.rows.length} rows${onRow?" · click a row to open it":""}</div></div><div class="act">${it.csv?`<a class="btn sm" href="${F(job,it.csv)}" download>Full CSV</a>`:""}</div></div><div class="tbl"><div class="tools"><input type="search" placeholder="Filter rows…" aria-label="Filter"></div><div class="tscroll"><table><thead><tr>${it.columns.map((h,i)=>`<th data-i="${i}">${esc(h)}</th>`).join("")}</tr></thead><tbody></tbody></table></div></div>${it.note?`<div class="note">${safe(it.note)}</div>`:""}`;
+ const tb=c.querySelector("tbody");const num=v=>{const x=parseFloat(String(v).replace(/[,%+]/g,""));return isNaN(x)?null:x};
+ function draw(){let rows=it.rows.map((r,i)=>[r,i]).filter(([r])=>!q||r.join(" ").toLowerCase().includes(q));if(sortCol>=0)rows.sort(([a],[b])=>{const x=num(a[sortCol]),y=num(b[sortCol]);return(x!=null&&y!=null?x-y:String(a[sortCol]).localeCompare(String(b[sortCol])))*dir});
+  tb.innerHTML=rows.slice(0,1000).map(([r,i])=>`<tr data-i="${i}" class="${onRow?"click":""}">${r.map(v=>`<td>${esc(v)}</td>`).join("")}</tr>`).join("");
+  if(onRow)tb.querySelectorAll("tr").forEach(tr=>tr.onclick=()=>{tb.querySelectorAll("tr").forEach(x=>x.style.outline="");tr.style.outline="2px solid var(--accent)";onRow(+tr.dataset.i)})}
+ c.querySelector("input").oninput=e=>{q=e.target.value.toLowerCase();draw()};
+ c.querySelectorAll("th").forEach(th=>th.onclick=()=>{const i=+th.dataset.i;dir=sortCol===i?-dir:1;sortCol=i;draw()});draw();return c}
+
+/* ------------------------------------------------------------------ a small interactive chart
+   Lines (chromatograms), sticks (centroided spectra) or both; drag across to zoom x, double-click to reset,
+   click to pick (callback gets the x value and nearest point), hover for a readout. */
+class Chart{
+ constructor(host,o={}){this.o=o;this.host=host;this.cv=el("canvas");host.appendChild(this.cv);this.ctx=this.cv.getContext("2d");this.series=[];this.bands=[];this.marks=[];this.view=null;
+  this.pad={l:58,r:14,t:26,b:30};new ResizeObserver(()=>this.resize()).observe(host);window.addEventListener("themechange",()=>this.draw());
+  let down=null;this.cv.addEventListener("pointerdown",e=>{down={x:e.offsetX,y:e.offsetY};this.cv.setPointerCapture(e.pointerId)});
+  this.cv.addEventListener("pointermove",e=>{if(down&&Math.abs(e.offsetX-down.x)>4){this.sel=[down.x,e.offsetX];this.draw()}else this.hover(e)});
+  this.cv.addEventListener("pointerup",e=>{if(!down)return;const dx=Math.abs(e.offsetX-down.x);if(dx>6){const a=this.xinv(Math.min(down.x,e.offsetX)),b=this.xinv(Math.max(down.x,e.offsetX));this.sel=null;if(this.o.onRange){this.draw();this.o.onRange(a,b)}else{this.view=[a,b];this.draw();this.o.onZoom&&this.o.onZoom(a,b)}}
+   else if(this.o.onClick){const x=this.xinv(e.offsetX);this.o.onClick(x,this.nearest(e.offsetX,e.offsetY))}down=null});
+  this.cv.addEventListener("dblclick",()=>{this.view=null;this.draw();this.o.onZoom&&this.o.onZoom(null,null)});
+  this.cv.addEventListener("pointerleave",()=>{$("#tip").hidden=true})}
+ resize(){const r=this.host.getBoundingClientRect();this.W=r.width;this.H=r.height;this.cv.width=this.W*devicePixelRatio;this.cv.height=this.H*devicePixelRatio;this.draw()}
+ set(series,opt={}){this.series=series;this.bands=opt.bands||[];this.marks=opt.marks||[];if(!opt.keepView)this.view=null;this.draw()}
+ xr(){if(this.view)return this.view;let a=Infinity,b=-Infinity;for(const s of this.series)for(const x of s.x){if(x<a)a=x;if(x>b)b=x}if(!isFinite(a))return[0,1];if(a===b){a-=0.5;b+=0.5}const p=(b-a)*(this.o.sticks?0.06:0);return[a-p,b+p]}
+ yr(xa,xb){let m=0;for(const s of this.series){for(let i=0;i<s.x.length;i++){const x=s.x[i];if(x>=xa&&x<=xb&&s.y[i]>m)m=s.y[i]}}return[0,(m||1)*1.12]}
+ xmap(x){const[a,b]=this.cur;return this.pad.l+(x-a)/(b-a)*(this.W-this.pad.l-this.pad.r)}
+ xinv(px){const[a,b]=this.cur||this.xr();return a+(px-this.pad.l)/(this.W-this.pad.l-this.pad.r)*(b-a)}
+ ymap(y){return this.H-this.pad.b-(y/this.ymax)*(this.H-this.pad.t-this.pad.b)}
+ draw(){if(!this.W)return;const c=this.ctx;const tok=v=>typeof v==="string"&&v.startsWith("--")?css(v):v;c.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);c.clearRect(0,0,this.W,this.H);
+  const[xa,xb]=this.cur=this.xr();this.ymax=this.yr(xa,xb)[1];const ink=css("--ink2"),mut=css("--muted"),line=css("--line");
+  c.strokeStyle=line;c.lineWidth=1;c.beginPath();c.moveTo(this.pad.l,this.pad.t-6);c.lineTo(this.pad.l,this.H-this.pad.b);c.lineTo(this.W-this.pad.r,this.H-this.pad.b);c.stroke();
+  c.fillStyle=mut;c.font="10.5px Geist Mono, monospace";c.textAlign="center";c.textBaseline="top";
+  const nt=Math.max(2,Math.floor((this.W-this.pad.l)/90)),step=nice((xb-xa)/nt);for(let v=Math.ceil(xa/step)*step;v<=xb;v+=step){const x=this.xmap(v);c.fillText(+v.toFixed(6)+"",x,this.H-this.pad.b+5);c.beginPath();c.moveTo(x,this.H-this.pad.b);c.lineTo(x,this.H-this.pad.b+3);c.stroke()}
+  c.textAlign="right";c.textBaseline="middle";const ys=nice(this.ymax/4);for(let v=0;v<=this.ymax;v+=ys){c.fillText(sci(v),this.pad.l-6,this.ymap(v))}
+  if(this.o.xlabel){c.textAlign="right";c.textBaseline="bottom";c.fillText(this.o.xlabel,this.W-this.pad.r,this.H-2)}
+  for(const b of this.bands){c.fillStyle=tok(b.color)||css("--accent");c.globalAlpha=b.alpha??.14;const x0=this.xmap(b.from),x1=this.xmap(b.to);c.fillRect(x0,this.pad.t,x1-x0,this.H-this.pad.t-this.pad.b);c.globalAlpha=1}
+  c.save();c.beginPath();c.rect(this.pad.l,0,this.W-this.pad.l-this.pad.r,this.H);c.clip();
+  for(const s of this.series){c.strokeStyle=tok(s.color)||ink;c.lineWidth=s.width||1.2;c.globalAlpha=s.alpha??1;
+   if(s.sticks){c.beginPath();for(let i=0;i<s.x.length;i++){if(s.x[i]<xa||s.x[i]>xb)continue;const x=this.xmap(s.x[i]);c.moveTo(x,this.ymap(0));c.lineTo(x,this.ymap(s.y[i]))}c.stroke()}
+   else{c.beginPath();let st=false;for(let i=0;i<s.x.length;i++){const x=this.xmap(s.x[i]),y=this.ymap(s.y[i]);if(!st){c.moveTo(x,y);st=true}else c.lineTo(x,y)}c.stroke()}
+   if(s.fill){c.globalAlpha=.18;c.fillStyle=tok(s.color);c.lineTo(this.xmap(s.x[s.x.length-1]),this.ymap(0));c.lineTo(this.xmap(s.x[0]),this.ymap(0));c.fill()}c.globalAlpha=1}
+  // peak labels: the tallest visible sticks that do not crowd each other
+  if(this.o.label){const s0=this.series[0];if(s0){const idx=[];for(let i=0;i<s0.x.length;i++)if(s0.x[i]>=xa&&s0.x[i]<=xb)idx.push(i);idx.sort((a,b)=>s0.y[b]-s0.y[a]);const used=[];c.fillStyle=ink;c.font="10px Geist Mono, monospace";c.textAlign="center";c.textBaseline="bottom";
+   for(const i of idx.slice(0,60)){if(used.length>=this.o.label)break;if(s0.y[i]<this.ymax*0.04)break;const x=this.xmap(s0.x[i]);if(used.some(u=>Math.abs(u-x)<48))continue;used.push(x);c.fillText(s0.x[i].toFixed(this.o.digits??4),x,this.ymap(s0.y[i])-2)}}}
+  for(const m of this.marks){const x=this.xmap(m.x),y=this.ymap(m.y);c.fillStyle=tok(m.color);c.font="600 10px Geist Mono, monospace";c.textAlign="center";c.textBaseline="bottom";c.fillText(m.text,x,y-2)}
+  c.restore();
+  if(this.sel){c.fillStyle=css("--accent");c.globalAlpha=.12;c.fillRect(Math.min(...this.sel),this.pad.t,Math.abs(this.sel[1]-this.sel[0]),this.H-this.pad.t-this.pad.b);c.globalAlpha=1}}
+ nearest(px,py){let best=null,bd=1e9;for(const s of this.series){for(let i=0;i<s.x.length;i++){const dx=this.xmap(s.x[i])-px;if(Math.abs(dx)>14)continue;const dy=s.sticks?Math.max(0,this.ymap(s.y[i])-py):this.ymap(s.y[i])-py;const d=Math.abs(dx)+Math.abs(dy)*(s.sticks?0.02:0.3);if(d<bd){bd=d;best={x:s.x[i],y:s.y[i],s:s.label,i}}}}return best}
+ hover(e){const n=this.nearest(e.offsetX,e.offsetY),t=$("#tip");if(!n){t.hidden=true;return}t.hidden=false;t.textContent=`${this.o.xname||"x"} ${n.x.toFixed(this.o.digits??4)} · ${sci(n.y)}${n.s?" · "+n.s:""}`;t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px"}}
+function nice(v){const p=Math.pow(10,Math.floor(Math.log10(v||1))),f=v/p;return(f<1.5?1:f<3?2:f<7?5:10)*p}
+
+/* ------------------------------------------------------------------ raw-data explorer widget */
+function explorerCard(it,job,R){const runs=R.runs||[];const c=el("article","card wide");
+ c.innerHTML=`<div class="hd"><div><h3>${esc(it.title||"Raw data explorer")}</h3><div class="sub">click the chromatogram → spectrum · click a peak → its ion chromatogram in every file · drag to zoom · double-click to reset</div></div></div>
+ <div class="xp"><div class="plots">
+  <div class="pl" data-p="chrom"><div class="cap"></div><div class="pact"><button class="btn sm" data-a="avg" title="Average all spectra in the zoomed time range">Average range</button><button class="btn sm" data-a="deconv" title="Charge-state deconvolution of the zoomed range (intact proteins)">Deconvolute</button></div></div>
+  <div class="pl tall" data-p="spec"><div class="cap"></div><div class="pact"><button class="btn sm" data-a="prev" title="Previous scan">‹</button><button class="btn sm" data-a="next" title="Next scan">›</button></div></div>
+  <div class="pl" data-p="xic"><div class="cap">Extracted-ion chromatogram — click a spectrum peak or type an m/z</div></div>
+ </div><div class="side">
+  <div class="grp"><h4>File</h4><select data-s="run">${runs.map((r,i)=>`<option value="${i}">${esc(r.name)}</option>`).join("")}</select>
+   <div class="two"><label>Trace<select data-s="type"><option value="tic">TIC</option><option value="bpc">Base peak</option></select></label><label>MS level<select data-s="level"><option>1</option><option>2</option></select></label></div>
+   <label data-srmwrap hidden>SRM transition<select data-s="srm"></select></label><div class="hint" data-s="info"></div></div>
+  <div class="grp"><h4>Ion chromatogram</h4><div class="two"><label>m/z<input data-s="mz" placeholder="e.g. 445.1200"></label><label>± ppm<input data-s="ppm" value="10"></label></div>
+   <button class="btn sm accent" data-a="xic">Extract in all files</button><div data-s="xtab"></div></div>
+  <div class="grp" data-s="ms2grp" hidden><h4>MS/MS</h4><div data-s="kids"></div><label>Peptide to annotate<input data-s="seq" placeholder="e.g. PEPTIDEK"></label><button class="btn sm" data-a="annot">Annotate b/y ions</button><div class="hint" data-s="annot"></div></div>
+  <div class="grp" data-s="dgrp" hidden><h4>Deconvoluted masses</h4><div class="two"><label>charge min<input data-s="zmin" value="5"></label><label>charge max<input data-s="zmax" value="60"></label><label>mass min<input data-s="mmin" value="5000"></label><label>mass max<input data-s="mmax" value="80000"></label></div><div data-s="dtab"></div></div>
+ </div></div>`;
+ const q=s=>c.querySelector(`[data-s="${s}"]`),pl=s=>c.querySelector(`[data-p="${s}"]`);
+ if(!runs.length){c.querySelector(".xp").innerHTML=`<p class="hint" style="padding:16px">This analysis did not record its raw files.</p>`;return c}
+ const ch=new Chart(pl("chrom"),{xname:"min",digits:2,xlabel:"min",onClick:x=>loadSpec({rt:x}),onZoom:(a,b)=>{S.xpRange=a==null?null:[a,b]}});
+ const sp=new Chart(pl("spec"),{sticks:true,label:10,xname:"m/z",xlabel:"m/z",onClick:(x,n)=>{const mz=n?n.x:x;q("mz").value=mz.toFixed(4);runXic(mz)}});
+ const xc=new Chart(pl("xic"),{xname:"min",digits:2,xlabel:"min",onClick:x=>runXic(+q("mz").value,x)});
+ let run=0,spec=null;
+ async function loadChrom(){const type=q("type").value,level=+q("level").value;
+  try{const d=await api(`/api/jobs/${job}/run/${run}/chrom?type=${type}&level=${level}`);ch.set([{x:d.t,y:d.y,color:"--accent",fill:true}]);
+   pl("chrom").querySelector(".cap").textContent=`${runs[run].name} · ${type.toUpperCase()} · MS${level} · ${d.n.toLocaleString()} scans`;
+   const r=runs[run];q("info").textContent=`${r.format} · ${r.spectra.toLocaleString()} spectra (${r.ms1.toLocaleString()} MS1, ${r.ms2.toLocaleString()} MS/MS) · ${r.polarity} · ${r.centroided?"centroid":"profile"}`;
+   if(d.srm&&d.srm.length){c.querySelector("[data-srmwrap]").hidden=false;q("srm").innerHTML=`<option value="">— show TIC —</option>`+d.srm.map(s=>`<option value="${s.i}">${esc(s.q1?`${s.q1.toFixed(2)} → ${s.q3.toFixed(2)}`:s.id)}</option>`).join("")}
+   else c.querySelector("[data-srmwrap]").hidden=true;
+   if(!spec&&d.t.length){let k=0;for(let i=1;i<d.y.length;i++)if(d.y[i]>d.y[k])k=i;loadSpec({rt:d.t[k]})}}
+  catch(e){pl("chrom").querySelector(".cap").textContent="Could not load: "+e.message}}
+ async function loadSpec(o){const level=+q("level").value;const u=o.idx!=null?`idx=${o.idx}`:`rt=${o.rt}&level=${level}`;
+  try{spec=await api(`/api/jobs/${job}/run/${run}/spectrum?${u}`);drawSpec();ch.set(ch.series,{keepView:true,bands:[{from:spec.rt-0.004,to:spec.rt+0.004,alpha:.8,color:"--warn"}]})}catch(e){toast(e.message)}}
+ function drawSpec(hits){const s=spec;sp.o.sticks=s.centroided;sp.o.label=hits?0:10;const marks=(hits||[]).map(h=>({x:h.obs_mz,y:h.intensity,text:h.ion+(h.z>1?"²⁺":""),color:h.ion[0]==="b"?"#2a64b0":"#c9304f"}));
+  const series=[{x:s.mz,y:s.i,sticks:s.centroided,color:"--ink2"}];
+  if(hits&&hits.length){series.push({x:hits.map(h=>h.obs_mz),y:hits.map(h=>h.intensity),sticks:true,color:"#c9304f",width:2})}
+  sp.set(series,{marks});
+  pl("spec").querySelector(".cap").textContent=`scan ${s.scan} · ${s.rt.toFixed(3)} min · MS${s.level}${s.precursor?` · precursor ${s.precursor.toFixed(4)}${s.z?" ("+s.z+"+)":""}`:""} · ${s.mz.length.toLocaleString()} ${s.centroided?"peaks":"points"}`;
+  const ms2=s.level>1||s.children.length;q("ms2grp").hidden=!ms2;
+  q("kids").innerHTML=s.children.length?`<table class="mini"><tr><th>MS/MS of</th><th>z</th></tr>${s.children.slice(0,20).map(k=>`<tr class="click" data-idx="${k.idx}"><td>${k.precursor.toFixed(4)}</td><td>${k.z||"?"}</td></tr>`).join("")}</table>`:(s.level>1?`<p class="hint" style="margin:0">Fragment spectrum. Type the peptide to check which b/y ions it explains.</p>`:"");
+  q("kids").querySelectorAll("tr[data-idx]").forEach(t=>t.onclick=()=>loadSpec({idx:+t.dataset.idx}))}
+ async function runXic(mz,rt){if(!mz||!isFinite(mz)){toast("Type an m/z first.");return}const ppm=+q("ppm").value||10;
+  pl("xic").querySelector(".cap").textContent=`Extracting m/z ${(+mz).toFixed(4)} ± ${ppm} ppm in ${runs.length} file${runs.length>1?"s":""}…`;
+  try{const d=await api(`/api/jobs/${job}/xic?mz=${mz}&ppm=${ppm}${rt!=null?`&rt=${rt}`:""}`);
+   const cols=d.traces.map((t,i)=>t.k===run?"--accent":COLORS[i%COLORS.length]);
+   xc.set(d.traces.map((t,i)=>({x:t.t,y:t.y,color:cols[i],label:t.name,width:t.k===run?2:1.1,alpha:t.k===run?1:.7})),{bands:d.traces.filter(t=>t.k===run&&t.peak).map(t=>({from:t.peak.start,to:t.peak.end}))});
+   pl("xic").querySelector(".cap").textContent=`XIC m/z ${(+mz).toFixed(4)} ± ${ppm} ppm${rt!=null?` · integrated near ${rt.toFixed(2)} min`:" · tallest peak integrated (click the trace to pick another)"}`;
+   q("xtab").innerHTML=`<table class="mini"><tr><th>File</th><th>RT</th><th>Area</th><th>S/N</th></tr>${d.traces.map((t,i)=>`<tr><td><i class="sw" style="background:${cols[i].startsWith("--")?`var(${cols[i]})`:cols[i]}"></i>${esc(t.name.slice(0,18))}</td><td>${t.peak?t.peak.rt.toFixed(2):"—"}</td><td>${t.peak?sci(t.peak.area):"not found"}</td><td>${t.peak?Math.round(t.peak.snr):""}</td></tr>`).join("")}</table>`}
+  catch(e){toast(e.message)}}
+ c.querySelector('[data-a="xic"]').onclick=()=>runXic(+q("mz").value);q("mz").onkeydown=e=>{if(e.key==="Enter")runXic(+q("mz").value)};
+ c.querySelector('[data-a="prev"]').onclick=()=>spec&&loadSpec({idx:Math.max(0,spec.idx-1)});
+ c.querySelector('[data-a="next"]').onclick=()=>spec&&loadSpec({idx:Math.min(spec.n_spectra-1,spec.idx+1)});
+ c.querySelector('[data-a="avg"]').onclick=async()=>{const r=ch.view||ch.xr();try{const d=await api(`/api/jobs/${job}/run/${run}/average?lo=${r[0]}&hi=${r[1]}&level=${q("level").value}`);
+  spec={...spec,mz:d.mz,i:d.i,centroided:d.centroided,children:[],level:+q("level").value,precursor:null,scan:"average",rt:(r[0]+r[1])/2};drawSpec();pl("spec").querySelector(".cap").textContent=`average of ${r[0].toFixed(2)}–${r[1].toFixed(2)} min · ${d.mz.length.toLocaleString()} peaks`}catch(e){toast(e.message)}};
+ c.querySelector('[data-a="deconv"]').onclick=async()=>{const r=ch.view||ch.xr();q("dgrp").hidden=false;q("dtab").innerHTML=`<p class="hint">Deconvoluting ${r[0].toFixed(2)}–${r[1].toFixed(2)} min…</p>`;
+  try{const d=await api(`/api/jobs/${job}/run/${run}/deconvolute?lo=${r[0]}&hi=${r[1]}&zmin=${q("zmin").value}&zmax=${q("zmax").value}&mmin=${q("mmin").value}&mmax=${q("mmax").value}`);
+   sp.o.sticks=false;sp.o.label=0;sp.set([{x:d.mass,y:d.score,color:"--accent",fill:true}],{marks:d.peaks.slice(0,6).map(p=>({x:p.mass,y:p.score,text:p.mass.toFixed(1),color:"--ink"}))});
+   pl("spec").querySelector(".cap").textContent=`zero-charge mass spectrum · ${r[0].toFixed(2)}–${r[1].toFixed(2)} min`;
+   q("dtab").innerHTML=d.peaks.length?`<table class="mini"><tr><th>Mass (Da)</th><th>Rel. %</th></tr>${d.peaks.map(p=>`<tr><td>${p.mass.toFixed(1)}</td><td>${p.rel.toFixed(0)}</td></tr>`).join("")}</table><p class="hint">Masses supported by ≥3 consecutive charge states. Zoom the chromatogram to the protein's peak first.</p>`:`<p class="hint">No charge-state series found in this range.</p>`}catch(e){q("dtab").innerHTML=`<p class="hint">${esc(e.message)}</p>`}};
+ c.querySelector('[data-a="annot"]').onclick=async()=>{const seq=q("seq").value.trim();if(!seq||!spec)return;
+  try{const d=await api(`/api/jobs/${job}/run/${run}/annotate?idx=${spec.idx}&seq=${encodeURIComponent(seq)}`);drawSpec(d.hits);
+   const nb=new Set(d.hits.filter(h=>h.ion[0]==="b").map(h=>h.ion)).size,ny=new Set(d.hits.filter(h=>h.ion[0]==="y").map(h=>h.ion)).size;
+   q("annot").innerHTML=`${nb} b and ${ny} y ions matched (±20 ppm); they explain <b>${(d.explained*100).toFixed(0)}%</b> of the spectrum's intensity.${d.precursor?` Peptide m/z at ${d.z}+: ${d.peptide_mz.toFixed(4)} vs precursor ${d.precursor.toFixed(4)} (${((d.precursor-d.peptide_mz)/d.peptide_mz*1e6).toFixed(1)} ppm).`:""}`}catch(e){q("annot").textContent=e.message}};
+ q("run").onchange=()=>{run=+q("run").value;spec=null;loadChrom()};q("type").onchange=loadChrom;q("level").onchange=()=>{spec=null;loadChrom()};
+ q("srm").onchange=async()=>{const v=q("srm").value;if(v===""){loadChrom();return}const d=await api(`/api/jobs/${job}/run/${run}/chrom?type=srm&c=${v}`);ch.set([{x:d.t,y:d.y,color:"--accent",fill:true}]);pl("chrom").querySelector(".cap").textContent=d.label||"SRM"};
+ S.explorer={xic:(mz,rt,k)=>{if(k!=null&&k!==run){run=k;q("run").value=k;spec=null;loadChrom()}q("mz").value=(+mz).toFixed(4);runXic(mz,rt);c.scrollIntoView({behavior:"smooth",block:"center"})},
+  spectrum:(k,idx,seq)=>{if(k!==run){run=k;q("run").value=k;loadChrom()}loadSpec({idx}).then(()=>{if(seq){q("seq").value=seq;c.querySelector('[data-a="annot"]').click()}});c.scrollIntoView({behavior:"smooth",block:"center"})}};
+ setTimeout(loadChrom,50);return c}
+
+/* feature / PSM / target tables that open the explorer on click */
+function featureTable(it,job,R){const rows=it.rows||[];if(!rows.length)return el("div");const cols=Object.keys(rows[0]).filter(k=>!k.startsWith("_")&&!Array.isArray(rows[0][k]));
+ return tableCard({title:it.title||"Features",columns:cols,rows:rows.map(r=>cols.map(k=>typeof r[k]==="number"?(Math.abs(r[k])<1e-3&&r[k]!==0?r[k].toExponential(2):+r[k].toFixed(4)):r[k]??"")),csv:it.csv,note:it.note||"Click a feature to extract its ion chromatogram in every file in the Raw data explorer."},job,
+  i=>{const r=rows[i];const mz=r.mz??r.mz_obs??r["m/z"],rt=r.rt_min??r.rt??r["RT (min)"];if(!S.explorer){toast("The explorer is not on this page.");return}S.explorer.xic(mz,rt,r._run??r.file_index)})}
+function psmTable(it,job,R){const rows=it.rows||[];if(!rows.length)return el("div");
+ const cols=["run_name","peptide","charge","q","hyperscore","protein","gene","rt_min","ppm","precursor_mz"].filter(k=>k in rows[0]);
+ return tableCard({title:it.title||"Peptide-spectrum matches",columns:cols,rows:rows.map(r=>cols.map(k=>typeof r[k]==="number"?(Math.abs(r[k])<1e-3&&r[k]!==0?r[k].toExponential(2):+r[k].toFixed(4)):r[k]??"")),csv:it.csv,note:"Click a match to draw its spectrum with the b/y ions the peptide explains in the Raw data explorer."},job,
+  i=>{const r=rows[i];if(!S.explorer){toast("The explorer is not on this page.");return}S.explorer.spectrum(r.run??0,r.scan,r.peptide_chem||r.sequence||r.peptide)})}
+function targetReview(it,job,R){const rows=it.rows||[];if(!rows.length)return el("div");
+ const cols=["target","sample","type","rt","area","response","concentration","report","snr","flags"].filter(k=>k in rows[0]);
+ const wrap=el("div","card wide");wrap.style.border="0";wrap.style.background="transparent";
+ const detail=el("article","card wide");detail.hidden=true;
+ detail.innerHTML=`<div class="hd"><div><h3 data-t></h3><div class="sub">drag across the trace to set new integration boundaries · double-click to reset the view</div></div><div class="act"><button class="btn sm" data-auto>Automatic boundaries</button></div></div>
+  <div class="xp" style="grid-template-columns:minmax(0,1fr) 280px"><div class="plots"><div class="pl tall" data-pl></div></div><div class="side"><div class="grp"><h4>Integration</h4><div data-res class="hint"></div></div><div class="grp"><div class="two"><label>start (min)<input data-s></label><label>end (min)<input data-e></label></div><button class="btn sm accent" data-go>Re-integrate</button><p class="hint" style="margin:0">Manual results are shown here for review; they are not written back into the tables or CSV files.</p></div></div></div>`;
+ let cur=-1;const chart=new Chart(detail.querySelector("[data-pl]"),{xname:"min",digits:2,xlabel:"min",onRange:(a,b)=>{detail.querySelector("[data-s]").value=a.toFixed(3);detail.querySelector("[data-e]").value=b.toFixed(3);go(a,b)}});
+ async function go(a,b){try{const d=await post(`/api/jobs/${job}/reintegrate`,{row:cur,start:a,end:b});
+   chart.set([{x:d.t,y:d.y,color:"--accent",fill:false,width:1.6}],{bands:[{from:d.start,to:d.end}],keepView:a!=null});
+   const au=d.auto||{};detail.querySelector("[data-s]").value=(+d.start).toFixed(3);detail.querySelector("[data-e]").value=(+d.end).toFixed(3);
+   detail.querySelector("[data-res]").innerHTML=`<table class="mini"><tr><th></th><th>automatic</th><th>${a!=null?"manual":"now"}</th></tr>
+    <tr><td>start–end</td><td>${fmt(au.start,2)}–${fmt(au.end,2)}</td><td>${fmt(d.start,2)}–${fmt(d.end,2)}</td></tr>
+    <tr><td>area</td><td>${sci(au.area)}</td><td>${sci(d.area)}</td></tr>
+    <tr><td>concentration</td><td>${esc(au.report??sci(au.concentration))}</td><td>${d.concentration!=null?sci(d.concentration):"—"}</td></tr>
+    <tr><td>S/N</td><td></td><td>${d.snr!=null?Math.round(d.snr):"—"}</td></tr></table>`}
+  catch(e){toast(e.message)}}
+ detail.querySelector("[data-go]").onclick=()=>go(+detail.querySelector("[data-s]").value,+detail.querySelector("[data-e]").value);
+ detail.querySelector("[data-auto]").onclick=()=>go(null,null);
+ const table=tableCard({title:it.title||"Integration review",columns:cols,rows:rows.map(r=>cols.map(k=>{const v=r[k];return typeof v==="number"?(Math.abs(v)>=1e5?v.toExponential(3):+v.toFixed(3)):Array.isArray(v)?v.join("; "):v??""})),note:"Click a row to see what was integrated and, if needed, set the peak boundaries by hand."},job,
+  i=>{cur=i;const r=rows[i];detail.hidden=false;detail.querySelector("[data-t]").textContent=`${r.target} — ${r.sample}`;go(null,null);detail.scrollIntoView({behavior:"smooth",block:"nearest"})});
+ wrap.style.display="contents";wrap.append(table,detail);return wrap}
+const WIDGETS={figure:figCard,table:(it,job)=>tableCard(it,job),ms_explorer:explorerCard,explorer:explorerCard,feature_table:featureTable,psm_table:psmTable,target_review:targetReview};
+
+/* ------------------------------------------------------------------ parameters panel */
+const TAGTXT={auto:"auto",user:"you set",default:"default",data:"from data",fixed:"fixed"};
+function paramsSection(R){const panel=R.params_panel,init={},fields={},sec=el("section","sec params");sec.id="params";
+ const opt=(o,v)=>`<option value="${esc(String(o))}" ${String(o)===String(v)?"selected":""}>${esc(String(o))||"— none —"}</option>`;
+ const rowHTML=f=>{const id="p_"+f.key,tag=f.type==="fixed"?"fixed":(f.source||"default"),v=f.value;let ctl;
+  if(f.type==="fixed")ctl=`<div class="ro">${esc(Array.isArray(v)?v.join(", "):String(v??"—"))}</div>`;
+  else if(f.type==="bool")ctl=`<input type="checkbox" id="${id}" ${v?"checked":""}>`;
+  else if(f.type==="select")ctl=`<select id="${id}">${(f.options||[]).map(o=>opt(o,v)).join("")}</select>`;
+  else if(["number","int","float"].includes(f.type))ctl=`<input type="number" step="any" id="${id}" value="${v??""}" placeholder="auto">`;
+  else ctl=`<input type="text" id="${id}" value="${esc(v==null?"":Array.isArray(v)?v.join(", "):String(v))}">`;
+  return `<div class="prow" data-row="${f.key}"><div class="pk">${esc(f.label)}<span class="tag ${tag}">${TAGTXT[tag]||tag}</span></div><div class="pc">${ctl}</div><p class="pw">${esc(f.why||"")}</p></div>`};
+ sec.innerHTML=`<div class="sech"><span class="k">Every choice</span><h2>Parameters</h2></div><p class="lede">What this analysis decided, and why. <span class="tag auto">auto</span> values were derived from your data, <span class="tag default">default</span> are the usual starting points, <span class="tag fixed">fixed</span> are not adjustable. Change anything and re-analyze — only what you change is overridden.</p>
+  ${panel.map(g=>`<div class="pgroup"><div class="pgh"><h4>${esc(g.title)}</h4>${g.note?`<p>${esc(g.note)}</p>`:""}</div>${g.fields.map(f=>{if(f.type!=="fixed"&&!f.key.startsWith("_")){init[f.key]=f.value;fields[f.key]=f}return rowHTML(f)}).join("")}</div>`).join("")}
+  <div class="pbar"><span id="p_count">Nothing changed yet</span><button class="btn" id="p_reset">Undo changes</button><button class="btn accent" id="p_go">Re-analyze</button></div>`;
+ const q=x=>sec.querySelector(x);
+ const read=k=>{const f=fields[k],e=q("#p_"+k);if(!f||!e)return null;if(f.type==="bool")return e.checked;if(["number","int","float"].includes(f.type))return e.value===""?null:+e.value;return e.value.trim()};
+ const norm=v=>JSON.stringify(Array.isArray(v)?v.join(", "):(v==null?"":v));
+ const changed=()=>Object.keys(fields).filter(k=>norm(read(k))!==norm(init[k]));
+ const refresh=()=>{const c=changed();Object.keys(fields).forEach(k=>q(`[data-row="${k}"]`)?.classList.toggle("changed",c.includes(k)));q("#p_reset").hidden=!c.length;q("#p_count").textContent=c.length?`Changed: ${c.map(k=>fields[k].label).join(", ")}`:"Nothing changed yet";q("#p_go").disabled=!c.length};
+ sec.querySelectorAll("input,select").forEach(e=>{e.addEventListener("input",refresh);e.addEventListener("change",refresh)});
+ q("#p_reset").onclick=()=>{renderResults(R);document.getElementById("params")?.scrollIntoView()};
+ q("#p_go").onclick=async()=>{const c=changed();if(!c.length)return;const p={};c.forEach(k=>{const v=read(k);p[k]=v===""?null:v});
+  const fd=new FormData();fd.append("params",JSON.stringify(p));showRunning(R.kind,"Re-analyzing with your parameters…");
+  try{const j=await api(`/api/rerun/${S.job}`,{method:"POST",body:fd});startPoll(j.job,j.kind)}catch(e){runError("Could not start the re-analysis: "+e.message)}};
+ setTimeout(refresh,0);return sec}
+
+/* ------------------------------------------------------------------ calculators */
+$("#calcBtn").onclick=e=>{e.preventDefault();go("calcs");if(!$("#cf_out").innerHTML){$("#cf_go").click();$("#cm_go").click();$("#cp_go").click()}};
+$("#cf_go").onclick=async()=>{try{const d=await post("/api/tools/formula",{formula:$("#cf_formula").value.trim(),polarity:+$("#cf_pol").value});
+ $("#cf_out").innerHTML=`<div class="big">${d.monoisotopic.toFixed(5)}</div><div class="hint">monoisotopic · average ${d.average.toFixed(4)} Da</div>
+  <table class="mini" style="margin-top:8px"><tr><th>Ion</th><th>m/z</th></tr>${d.adducts.map(a=>`<tr><td>${esc(a.adduct)}</td><td class="mono">${a.mz.toFixed(5)}</td></tr>`).join("")}</table>
+  <div class="hint" style="margin-top:8px">Isotope pattern of ${esc(d.adducts[0].adduct)}:</div>`;
+ const cv=$("#cf_iso");cv.hidden=false;const host=cv;cv.remove();const wrap=el("div");wrap.style.cssText="position:relative;height:150px";$("#cf_out").appendChild(wrap);
+ const chart=new Chart(wrap,{sticks:true,label:6,xname:"m/z",xlabel:"m/z"});chart.pad.t=18;chart.set([{x:d.isotopes.map(i=>i.mz),y:d.isotopes.map(i=>i.rel),sticks:true,color:"--accent",width:3}]);$("#cf_out").appendChild(host);host.hidden=true}
+ catch(e){$("#cf_out").innerHTML=`<p class="hint">${esc(e.message)}</p>`}};
+$("#cm_go").onclick=async()=>{try{const d=await post("/api/tools/mz",{mz:+$("#cm_mz").value,polarity:+$("#cm_pol").value,ppm:+$("#cm_ppm").value||10});
+ $("#cm_out").innerHTML=`<table class="mini"><tr><th>If the ion is</th><th>neutral mass</th></tr>${d.candidates.map(a=>`<tr><td>${esc(a.adduct)}</td><td class="mono">${a.neutral.toFixed(5)}</td></tr>`).join("")}</table>
+  <div class="hint" style="margin:8px 0 4px">${d.library.length?"Library matches (putative — m/z only, MSI level 3):":"No match in the built-in metabolite library."}</div>
+  ${d.library.length?`<table class="mini"><tr><th>Compound</th><th>Ion</th><th>ppm</th></tr>${d.library.map(h=>`<tr><td>${esc(h.name)}<br><span class="hint">${esc(h.formula)}</span></td><td>${esc(h.adduct)}</td><td>${h.ppm.toFixed(1)}</td></tr>`).join("")}</table>`:""}`}
+ catch(e){$("#cm_out").innerHTML=`<p class="hint">${esc(e.message)}</p>`}};
+$("#cp_go").onclick=async()=>{try{const d=await post("/api/tools/peptide",{sequence:$("#cp_seq").value,charges:[1,2]});
+ const n=d.sequence.replace(/\[[^\]]*\]/g,"").length,b=d.fragments.filter(f=>f.ion[0]==="b"&&f.z===1),y=d.fragments.filter(f=>f.ion[0]==="y"&&f.z===1);
+ $("#cp_out").innerHTML=`<div class="big">${d.monoisotopic.toFixed(5)}</div><div class="hint">monoisotopic neutral mass · ${esc(d.note)}</div>
+  <table class="mini" style="margin-top:8px"><tr>${[1,2,3,4].map(z=>`<th>[M+${z}H]${z}+</th>`).join("")}</tr><tr>${[1,2,3,4].map(z=>`<td class="mono">${d.mz[z].toFixed(4)}</td>`).join("")}</tr></table>
+  <table class="mini" style="margin-top:8px"><tr><th>#</th><th>b</th><th>y</th><th>#</th></tr>${b.map((f,i)=>`<tr><td>${i+1}</td><td class="mono">${f.mz.toFixed(4)}</td><td class="mono">${y[n-2-i]?y[n-2-i].mz.toFixed(4):""}</td><td>${n-1-i}</td></tr>`).join("")}</table>`}
+ catch(e){$("#cp_out").innerHTML=`<p class="hint">${esc(e.message)}</p>`}};
+
+/* ------------------------------------------------------------------ supported formats */
+const FORMATS=[["Thermo .raw","y","Orbitrap, Exploris, Astral, Q Exactive, TSQ. Converted on the fly with ThermoRawFileParser (downloaded on first use, ~35 MB)."],
+ ["Bruker timsTOF .d","y","TDF folders (analysis.tdf). Read natively; ion mobility is summed into each frame."],
+ ["Agilent .d","y","MassHunter (Q-TOF, QQQ) and ChemStation GC-MS/LC-MS folders, read with rainbow."],
+ ["Waters .raw","y","MassLynx folders (_FUNC*.DAT), read with rainbow."],
+ ["mzML / mzXML / mzData","y","Open standards any vendor software can export. Gzipped files are fine."],
+ ["MGF","y","Peak lists of MS/MS spectra (no MS1)."],["ANDI-MS .cdf","y","The universal GC-MS export (netCDF)."],
+ ["Sciex .wiff / .wiff2","n","No macOS reader exists. Convert once with ProteoWizard msconvert (Windows or its Docker image)."],
+ ["Shimadzu .lcd","n","No macOS reader exists. Convert with msconvert, or export mzML from LabSolutions."],
+ ["Bruker .d (BAF)","n","maXis, impact, compact, solariX. Convert with msconvert or DataAnalysis → mzML."]];
+$("#fmtBtn").onclick=e=>{e.preventDefault();$("#fmtGrid").innerHTML=FORMATS.map(([n,s,d])=>`<div><span class="st ${s}">${s==="y"?"reads directly":"convert first"}</span><b>${esc(n)}</b>${esc(d)}</div>`).join("")+`<div><span class="st c">convert command</span><b>msconvert</b><code style="font-size:11px">msconvert FILE --mzML --filter "peakPicking vendor msLevel=1-"</code></div>`;go("formats")};
+
+/* ------------------------------------------------------------------ code viewer, settings, quit */
+async function openCode(){const w=el("div","codewrap");w.innerHTML=`<div class="files"><div class="navlabel">Pipeline source</div><div id="srcList"></div></div>
+ <div class="body"><div class="bar"><h3 id="codeTitle"></h3><button class="btn sm" id="copyCode">Copy</button><button class="btn ghost sm" id="closeCode">✕</button></div><div class="desc" id="codeDesc"></div><pre id="codePre">Loading…</pre></div>`;
+ document.body.appendChild(w);w.querySelector("#closeCode").onclick=()=>w.remove();
+ const DESC={"server/explore.py":"Raw-data overview: chromatograms, LC-MS maps, acquisition statistics, contaminants and mass accuracy.","server/untargeted.py":"Untargeted LC-MS: feature finding, alignment, gap filling, filtering, drift correction, normalisation, statistics, annotation.","server/proteomics.py":"Proteomics: Sage search, FDR, identification QC, protein quantification, moderated t-test.","server/targeted.py":"Targeted quantification: integration, calibration curves, LOD/LOQ, back-calculation.","server/msio.py":"The Run data model, file readers, parse cache, centroiding, sample sheets.","server/vendor.py":"Vendor raw-file readers (Thermo, Bruker, Agilent, Waters, ANDI).","server/peaks.py":"Chromatographic peak detection and integration.","server/chem.py":"Formula, adduct, isotope, peptide and fragment calculations; charge-state deconvolution.","server/app.py":"HTTP API.","server/agent.py":"The in-app Claude assistant.","server/report.py":"PDF report."};
+ const pre=w.querySelector("#codePre");let cur="";const src=await api("/api/source");
+ const show=k=>{cur=src[k];w.querySelector("#codeTitle").textContent=k;w.querySelector("#codeDesc").textContent=DESC[k]||"";pre.textContent=cur;w.querySelectorAll(".files a").forEach(a=>a.classList.toggle("on",a.dataset.k===k))};
+ w.querySelector("#srcList").innerHTML=Object.keys(src).map(k=>`<a data-k="${esc(k)}">${esc(k.replace("server/",""))}</a>`).join("");
+ w.querySelectorAll(".files a").forEach(a=>a.onclick=()=>show(a.dataset.k));w.querySelector("#copyCode").onclick=()=>navigator.clipboard.writeText(cur).then(()=>toast("Copied"));
+ show(src[`server/${S.result?.kind||"explore"}.py`]?`server/${S.result?.kind||"explore"}.py`:Object.keys(src)[0])}
+$("#codeBtn").onclick=e=>{e.preventDefault();openCode()};
+async function openSettings(){const cur=await api("/api/settings");const m=el("div","modal");m.innerHTML=`<div class="box"><h3>Settings</h3>
+ <label>Anthropic API key <input type="password" id="st_key" placeholder="${cur.has_key?"Saved ("+esc(cur.key_hint)+") — paste to replace":"sk-ant-…"}"></label>
+ <label>Model <select id="st_model"><option selected>${esc(cur.model)}</option></select></label>
+ <div class="row"><button class="btn sm" id="st_test">Test key &amp; list models</button><span class="hint" id="st_msg"></span></div>
+ <p class="hint" style="margin:0">The key is stored only on this computer (~/.massspec-bench/config.json) and is used only by the assistant. If RNAseq Bench already has a key, it is used here too. Data and analyses live in ${esc(cur.home)}.</p>
+ <div class="row" style="justify-content:flex-end"><button class="btn" id="st_cancel">Cancel</button><button class="btn accent" id="st_save">Save</button></div></div>`;
+ document.body.appendChild(m);m.querySelector("#st_cancel").onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+ const fill=(list,sel)=>{m.querySelector("#st_model").innerHTML=[...new Set([sel,...list])].map(x=>`<option ${x===sel?"selected":""}>${esc(x)}</option>`).join("")};
+ m.querySelector("#st_test").onclick=async()=>{const k=m.querySelector("#st_key").value.trim(),msg=m.querySelector("#st_msg");msg.textContent="Checking…";if(k){await post("/api/settings",{api_key:k});m.querySelector("#st_key").value=""}
+  const j=await api("/api/models");fill(j.models,m.querySelector("#st_model").value);msg.textContent=j.ok?`Key works — ${j.models.length} models.`:"Key check failed: "+(j.error||"no key")};
+ m.querySelector("#st_save").onclick=async()=>{const body={model:m.querySelector("#st_model").value};const k=m.querySelector("#st_key").value.trim();if(k)body.api_key=k;const r=await post("/api/settings",body);toast(r.has_key?"Saved":"Saved (no API key yet)");m.remove()}}
+$("#settingsBtn").onclick=e=>{e.preventDefault();openSettings()};
+$("#quitBtn").onclick=async e=>{e.preventDefault();if(!confirm("Stop MassSpec Bench? Finished analyses stay on disk; a running one would be lost."))return;await fetch("/api/quit",{method:"POST"}).catch(()=>{});document.body.innerHTML='<div style="font:15px system-ui;padding:60px;text-align:center;color:#6a7b84">MassSpec Bench has stopped. Double-click the app to start it again — you can close this tab.</div>'};
+
+/* ------------------------------------------------------------------ assistant */
+const CONV=Math.random().toString(36).slice(2);const chat=$("#chat");
+function openChat(){chat.classList.add("open");document.body.classList.add("chat-open");$("#chatIn").focus()}
+function closeChat(){chat.classList.remove("open");document.body.classList.remove("chat-open")}
+$("#fab").onclick=openChat;$("#chatClose").onclick=closeChat;
+$("#chatReset").onclick=async()=>{await post("/api/agent/reset",{conv:CONV,message:""});$("#chatBody").innerHTML='<div class="msg ai"><p>New conversation.</p></div>'};
+function setChips(R){const c={explore:["Is this data good enough to analyse?","What are the main contaminants and do they matter?","Plot the XIC of m/z 445.12 in every file"],
+ untargeted:["Summarize the key findings","Do the QCs show drift or batch effects?","Which significant features have an annotation?","Re-run with median normalisation"],
+ proteomics:["How good were the identifications?","Summarize the differentially abundant proteins","Is the missing-value imputation distorting results?"],
+ targeted:["Which calibration curves are weak and why?","Are any integrations questionable?","Summarize concentrations by group"]}[R.kind]||["Summarize the key findings"];
+ $("#chips").innerHTML=c.map(t=>`<button>${esc(t)}</button>`).join("");$("#chips").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("#chatIn").value=b.textContent;send()})}
+setChips({kind:"explore"});
+function md(t){let h=esc(t);h=h.replace(/```(\w*)\n([\s\S]*?)```/g,(m,l,c)=>`<pre><code>${c}</code></pre>`).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/^### (.*)$/gm,"<h3>$1</h3>").replace(/^## (.*)$/gm,"<h2>$1</h2>").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/^\s*[-•] (.*)$/gm,"<li>$1</li>").replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/^\d+\. (.*)$/gm,"<li>$1</li>");
+ h=h.replace(/\b([\w\-]+\.png)\b/g,(m,f)=>S.job?`${m}<br><img src="${F(S.job,f)}?t=${Date.now()}" alt="${f}" onerror="this.remove()">`:m);
+ return h.split(/\n{2,}/).map(p=>p.startsWith("<")?p:`<p>${p.replace(/\n/g,"<br>")}</p>`).join("")}
+async function send(){const t=$("#chatIn").value.trim();if(!t||S.chatBusy)return;S.chatBusy=true;$("#chatIn").value="";const body=$("#chatBody");
+ body.appendChild(el("div","msg user",esc(t)));const ai=el("div","msg ai","");body.appendChild(ai);let buf="",cur=el("div");ai.appendChild(cur);body.scrollTop=body.scrollHeight;$("#chatHint").textContent="Thinking…";
+ try{const r=await fetch("/api/agent/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({conv:CONV,message:t,job:S.job})});
+  const rd=r.body.getReader(),dec=new TextDecoder();let rest="";
+  while(true){const{value,done}=await rd.read();if(done)break;rest+=dec.decode(value,{stream:true});const parts=rest.split("\n\n");rest=parts.pop();
+   for(const p of parts){if(!p.startsWith("data: "))continue;const ev=JSON.parse(p.slice(6));
+    if(ev.type==="text"){buf+=ev.text;cur.innerHTML=md(buf)}
+    else if(ev.type==="tool"){const d=el("details","toolcard");d.innerHTML=`<summary><i class="run"></i><b>${esc(ev.name)}</b><span class="hint">${esc(JSON.stringify(ev.input)).slice(0,90)}</span></summary><pre>${esc(JSON.stringify(ev.input,null,1))}</pre>`;ai.appendChild(d);buf="";cur=el("div");ai.appendChild(cur);$("#chatHint").textContent="Running "+ev.name+"…"}
+    else if(ev.type==="tool_result"){const d=[...ai.querySelectorAll(".toolcard")].pop();if(d){d.querySelector("i").classList.remove("run");d.querySelector("pre").textContent+="\n— result —\n"+ev.text}
+     if(/rerun_analysis/.test(ev.name)){try{const j=JSON.parse(ev.text);if(j.job){toast("Re-run started — opening it when done");watchJob(j.job)}}catch{}}}
+    else if(ev.type==="error"){cur.innerHTML=`<p style="color:var(--warn)">${esc(ev.text)}</p>`}
+    body.scrollTop=body.scrollHeight}}}
+ catch(e){cur.innerHTML=`<p style="color:var(--warn)">${esc(e.message)}</p>`}
+ S.chatBusy=false;$("#chatHint").textContent=""}
+$("#chatSend").onclick=send;$("#chatIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+function watchJob(job){const t=setInterval(async()=>{const s=await api(`/api/jobs/${job}/status`);if(s.state==="done"){clearInterval(t);loadResult(job);toast("Re-run finished")}else if(s.state==="error"){clearInterval(t);toast("Re-run failed: "+(s.error||""))}},1500)}
+
+/* ------------------------------------------------------------------ lifecycle
+   The app quits by itself when its last tab is closed (server/lifecycle.py). This page keeps an event stream
+   open, says "still here" every few seconds, and "closing" as it goes away; a reload says hello again within
+   the grace period. */
+const PAGE_ID=Math.random().toString(36).slice(2)+Date.now().toString(36);
+const alive=()=>fetch("/api/alive",{method:"POST",body:PAGE_ID,keepalive:true}).catch(()=>{});
+alive();setInterval(alive,3000);
+try{new EventSource("/api/window?page="+encodeURIComponent(PAGE_ID))}catch{}   // the socket drops the moment this window goes
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)alive()});
+window.addEventListener("pageshow",e=>{if(e.persisted)alive()});
+window.addEventListener("pagehide",e=>{if(!e.persisted)navigator.sendBeacon("/api/closing",PAGE_ID)});
+
+/* ------------------------------------------------------------------ boot */
+renderKind();renderRecent();sideRecent();
+const hm=location.hash.match(/job=([\w]+)/);if(hm)loadResult(hm[1],true);
+api("/api/settings").then(s=>{$("#appVersion").textContent="v"+s.version}).catch(()=>{});
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# MassSpec Bench — analysis + server dependencies.
+# Tested on macOS arm64 with python.org Python 3.12 (numpy 2.5, pandas 3.0, pyopenms 3.5).
+# Not Anaconda: its libomp is missing a symbol pyOpenMS needs, so the launcher skips conda Pythons.
+numpy>=1.26,<3
+pandas>=2.1
+scipy>=1.11
+scikit-learn>=1.3
+statsmodels>=0.14         # LOWESS for QC-based drift correction
+matplotlib>=3.8
+adjustText>=1.0
+pyopenms>=3.1             # mzML/mzXML I/O, centroiding, feature finding, alignment, linking
+pyteomics>=4.7            # MGF, masses, peptide chemistry
+lxml>=5.0                 # pyteomics XML parsing
+openpyxl>=3.1             # .xlsx sample sheets and target lists
+reportlab>=4.0
+pillow>=10
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+anthropic>=0.40
+certifi>=2024
+
+# --- optional: vendor readers ---------------------------------------------------
+# Each powers one vendor format and degrades to a clear "convert to mzML" message when missing.
+rainbow-api>=1.5,<1.6      # pinned: vendor.py keeps native m/z precision via rainbow internals · Agilent .d (MassHunter / ChemStation) and Waters .raw
+timsrust_pyo3>=0.4         # Bruker timsTOF .d (TDF)

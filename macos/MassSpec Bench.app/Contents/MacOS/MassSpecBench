@@ -1,0 +1,4 @@
+#!/bin/bash
+# MassSpec Bench — double-click launcher. All logic lives in Resources/app/launch.sh.
+APP_DIR="$(cd "$(dirname "$0")/../Resources/app" && pwd)"
+MODE=gui exec /bin/bash "$APP_DIR/launch.sh"
