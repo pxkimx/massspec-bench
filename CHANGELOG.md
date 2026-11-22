@@ -6,6 +6,8 @@
   open on any site could previously send one to localhost.
 - Toolbox Launcher's Light | Dark switch now reaches MassSpec Bench (`?appearance=` and the `toolbox-appearance`
   message).
+- The assistant's default model is now Claude Sonnet 5.5 (the list offered without a key: Sonnet 5.5, Opus 5.5,
+  Haiku 5.5). A saved choice the key no longer sees still falls back to the newest Sonnet it lists.
 - Proteomics normalisation box plots use Matplotlib's `orientation` (the old `vert` argument is going away);
   the untargeted test no longer triggers pandas warnings.
 

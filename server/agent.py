@@ -15,8 +15,8 @@ from typing import Iterator
 
 from .common import JOBS, load_settings, read_json
 
-DEFAULT_MODEL = "claude-sonnet-5"
-FALLBACK_MODELS = ["claude-sonnet-5", "claude-opus-5-5", "claude-haiku-4-5-20251001"]
+DEFAULT_MODEL = "claude-sonnet-5-5"
+FALLBACK_MODELS = ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"]
 
 
 def available_models() -> dict:
