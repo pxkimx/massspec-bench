@@ -7,9 +7,16 @@
 <meta name="author" content="Paul H. Kim, Ph.D.">
 <script>
 /* Light | Dark: applied here, before anything is drawn, so the other theme never flashes. No saved choice =
-   follow the Mac's appearance (the look MassSpec Bench always had). Older versions stored the value JSON-quoted. */
-(function(){try{var t=localStorage.getItem("theme");if(t&&t.charAt(0)==='"')t=JSON.parse(t);
- if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+   follow the Mac's appearance (the look MassSpec Bench always had). Older versions stored the value JSON-quoted.
+   Toolbox Launcher, which frames this page, hands over its choice: ?appearance=light|dark or a "toolbox-appearance" message. */
+(function(){var ok=function(v){return v==="light"||v==="dark"},save=function(v){try{localStorage.setItem("theme",v)}catch(e){}},t=null,q=null;
+ try{t=localStorage.getItem("theme");if(t&&t.charAt(0)==='"')t=JSON.parse(t)}catch(e){}
+ try{q=new URLSearchParams(location.search).get("appearance")}catch(e){}
+ if(ok(q)){t=q;save(q)}                        /* Toolbox Launcher opened this page with its own choice */
+ if(ok(t))document.documentElement.setAttribute("data-theme",t);
+ addEventListener("message",function(e){var m=e.data;     /* the launcher's switch flipped while this page is open */
+  if(m&&m.type==="toolbox-appearance"&&ok(m.appearance)){document.documentElement.setAttribute("data-theme",m.appearance);
+   save(m.appearance);dispatchEvent(new Event("themechange"))}})})();
 </script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='.5' y='.5' width='31' height='31' rx='7.5' fill='%230d1b22'/><path d='M6.6 25H27.4M7 4.6V25.4' stroke='%236a7b84' stroke-width='1.05' stroke-linecap='round' opacity='.75'/><g stroke-width='2' stroke-linecap='round'><path d='M10 25V17' stroke='%234ea3ff'/><path d='M13.5 25V8' stroke='%2300e0cf'/><path d='M17 25V19' stroke='%23b27bff'/><path d='M20.5 25V12' stroke='%23ffb020'/><path d='M24 25V21' stroke='%23ff5c8a'/></g></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -662,6 +669,7 @@ $$("#themeSw button").forEach(b=>{b.onclick=()=>setTheme(b.dataset.t);
 // with no choice made the page follows the Mac's appearance, so redraw the canvases when that changes
 DARK_MQ.addEventListener("change",()=>{if(!document.documentElement.dataset.theme){syncThemeSw();window.dispatchEvent(new Event("themechange"))}});
 // another MassSpec Bench window (or the Toolbox Launcher frame) changed the theme
+window.addEventListener("themechange",syncThemeSw);
 window.addEventListener("storage",e=>{if(e.key==="theme"&&(e.newValue==="light"||e.newValue==="dark")&&e.newValue!==document.documentElement.dataset.theme){document.documentElement.dataset.theme=e.newValue;syncThemeSw();window.dispatchEvent(new Event("themechange"))}});
 syncThemeSw();
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();

@@ -8,6 +8,7 @@ import threading
 import uuid
 from collections import OrderedDict
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import numpy as np
 from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile
@@ -22,6 +23,19 @@ VERSION = (ROOT / "VERSION").read_text().strip() if (ROOT / "VERSION").exists() 
 UPLOADS = HOME / "uploads"
 UPLOADS.mkdir(parents=True, exist_ok=True)
 app = FastAPI(title="MassSpec Bench", version=VERSION)
+
+
+@app.middleware("http")
+async def same_origin_only(request: Request, call_next):
+    """Refuse state-changing requests sent by other web sites. A page open on any site can POST to localhost
+    without a preflight (a form, sendBeacon, text/plain fetch), so without this it could quit the app or start work.
+    Requests from this app's own pages carry its own Origin; tools without a browser (curl, the launcher) send none."""
+    if request.method not in ("GET", "HEAD", "OPTIONS"):
+        origin = request.headers.get("origin")
+        site = request.headers.get("sec-fetch-site")
+        if site == "cross-site" or (origin is not None and urlsplit(origin).netloc != request.headers.get("host", "")):
+            return JSONResponse({"detail": "Requests from other web sites are not accepted."}, status_code=403)
+    return await call_next(request)
 print(f"MassSpec Bench {VERSION} — data in {HOME} — python {__import__('platform').python_version()}", flush=True)
 _lock = threading.Semaphore(1)  # one heavy analysis at a time
 

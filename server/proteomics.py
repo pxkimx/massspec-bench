@@ -34,6 +34,9 @@ from .common import (DOWN, NS, PALETTE, QC_COLOR, UP, Job, UserFacingError, comm
                      resolve, versions)
 
 import matplotlib.pyplot as plt  # noqa: E402  (common sets the Agg backend first)
+import matplotlib  # noqa: E402
+
+_MPL_ORIENTATION = tuple(int(x) for x in matplotlib.__version__.split(".")[:2]) >= (3, 10)
 
 C13 = 1.00335483
 PROTON = 1.007276467
@@ -1316,7 +1319,8 @@ def _quant_section(job, raw, X, Xn, Xv, Xi, imp_mask, valid, samples, sample_gro
         fig, axs = plt.subplots(1, 2, figsize=(10, max(2.8, 0.26 * S + 1.2)), sharey=True)
         for ax, M, t in ((axs[0], X, "before normalisation"), (axs[1], Xn, "after " + ("median normalisation" if norm == "median" else "(no normalisation)"))):
             data = [M[np.isfinite(M[:, j]), j] for j in range(S)]
-            bp = ax.boxplot(data, vert=False, showfliers=False, patch_artist=True, widths=0.6)
+            horiz = {"orientation": "horizontal"} if _MPL_ORIENTATION else {"vert": False}   # 'vert' goes in 3.13
+            bp = ax.boxplot(data, showfliers=False, patch_artist=True, widths=0.6, **horiz)
             for patch, c in zip(bp["boxes"], scol):
                 patch.set_facecolor(c)
                 patch.set_alpha(0.6)

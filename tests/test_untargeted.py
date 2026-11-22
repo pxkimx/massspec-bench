@@ -337,9 +337,9 @@ def test_negative_batches():
     q1 = [c for c in raw.columns if c.startswith("QC_b1") and not c.startswith("status_")]
     q2 = [c for c in raw.columns if c.startswith("QC_b2") and not c.startswith("status_")]
     proc = pd.read_csv(root / "feature_table_processed.csv")
-    step_raw = float(np.nanmedian(np.log2(k[q2].mean(1) / k[q1].mean(1))))
-    step_after = float(np.nanmedian(proc[[c for c in proc.columns if c.startswith("QC_b2")]].mean(1)
-                                    - proc[[c for c in proc.columns if c.startswith("QC_b1")]].mean(1)))
+    step_raw = float(np.nanmedian(np.log2(k[q2].mean(axis=1) / k[q1].mean(axis=1))))
+    step_after = float(np.nanmedian(proc[[c for c in proc.columns if c.startswith("QC_b2")]].mean(axis=1)
+                                    - proc[[c for c in proc.columns if c.startswith("QC_b1")]].mean(axis=1)))
     print(f"negative: {found}/{len(truth)} compounds, polarity {pol['resolved']}, ANOVA-significant "
           f"{int((st.padj_anova < 0.05).sum())}, batch step {step_raw:+.2f} → {step_after:+.2f} log2, {dt:.1f} s")
     assert pol["resolved"] == "negative"

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.4 — safety and launcher hand-off (2026-11-22)
+- Other web sites can no longer quit the app or start work in it: requests that change something must come from the
+  app's own page (or from a tool without a browser, such as curl). A cross-site POST needs no preflight, so a page
+  open on any site could previously send one to localhost.
+- Toolbox Launcher's Light | Dark switch now reaches MassSpec Bench (`?appearance=` and the `toolbox-appearance`
+  message).
+- Proteomics normalisation box plots use Matplotlib's `orientation` (the old `vert` argument is going away);
+  the untargeted test no longer triggers pandas warnings.
+
 ## 1.0.3 — Light | Dark theme choice (2026-10-07)
 - A Light | Dark switch (sun and moon) at the top of the sidebar, on every page, replaces the single moon button.
   With no choice made the app follows the Mac's appearance, as before. The choice is stored as
